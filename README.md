@@ -50,10 +50,13 @@ the Gaiaphotom scripts use custom match.py and angsep.py from Henry Ferguson.
 The code copies all fits files to a single directory, and soft-links the fits files to folders for the different types of data (bias, science, etc.)
 All folders live under a single top-level directory, pointed to by the environment variable $viskom, which you need to configure by hand in the 'viskom' script.
 
-Make sure that the toplevel directory is set to $viskom, and in that directory do
-mkdir FITS BIAS CHARGE DARK FLAT SCIENCE GAIAPHOTOM
+Make sure that $viskom is set to the toplevel directory, and do
+<pre>
+	cd $viskom
+	mkdir FITS BIAS CHARGE DARK FLAT SCIENCE GAIAPHOTOM
+</pre>
 
-copy the contents of all cronjobs/* directories to the src directory (do not make subdirectories, all code should live in $viskom/src/ ). 
+Then copy the contents of all cronjobs/* directories to the $viskom/src directory (do not make subdirectories, all code should live in $viskom/src/ ). 
 Some files are duplicated, you should be able to select only the ones you want.
 
 The hierarchy of processing is as follows (so that e.g., catproc requires setyyyymm, dleas and sciencexy):
@@ -71,7 +74,7 @@ xmovie combines results from png, catproc and darketc.
 </pre>
 ---------
 
-The following cronjobs take care of various parts of the processing:
+The following jobs, which can be run as cronjobs, take care of various parts of the processing:
 
 **cronjobdleas** -
      query the EAS for the LE1 fits files of the past 2 weeks, and download the FITS files not yet present
