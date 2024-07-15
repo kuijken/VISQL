@@ -11,7 +11,7 @@ VIS quick-look raw fits data monitoring code
 All code is wrapped by tcsh scripts.
 
 Copy dot.p3start to .p3start in home directory to define a few p3 startup modules
-The following modules are imported by various scripts:
+The following python modules are imported by various scripts and need to be present:
 
 <pre>
 from astropy.coordinates import get_sun
@@ -43,7 +43,7 @@ import os, requests
 import time
 </pre>
 
-the Gaiaphotom scripts use custom match.py and angsep.py from Henry Ferguson.
+the Gaiaphotom scripts use custom match.py and angsep.py from Henry Ferguson (included in the gaiaphotom folder).
 
 ---------
 
@@ -58,6 +58,12 @@ Make sure that $viskom is set to the toplevel directory, and do
 
 Then copy the contents of all cronjobs/* directories to the $viskom/src directory (do not make subdirectories, all code should live in $viskom/src/ ). 
 Some files are duplicated, you should be able to select only the ones you want.
+
+External executables that are needed to run these scripts include
+<pre>
+SExtractor, dfits, dos2unix, ds9 .
+</pre>
+
 
 The hierarchy of processing is as follows (so that e.g., catproc requires setyyyymm, dleas and sciencexy):
 
