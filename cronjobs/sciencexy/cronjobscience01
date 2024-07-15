@@ -2,11 +2,6 @@
 
 viskom
 
-#if `ps aux | grep md0_res | grep "\[" |wc -l` then
-# echo ===XXXXXXX=== md0_resync in progress. Not starting at `date` ===
-# exit
-#endif
-
 set lockfile = ~/viskomcatscience_01-lock
 
 if ! -e $lockfile then
@@ -21,45 +16,6 @@ if ! -e $lockfile then
  echo DETECTALL SCIENCE
  source $scr/detectall_xx 01 | grep -v present
  echo ===== Finished science01 at `date`
- 
- if `ps aux | grep md0_res | grep "\[" |wc -l` then
-  echo ===XXXXXXX=== md0_resync in progress. Queuing science23 job
-  set lockfile23 = ~/viskomcatscience_23-lock
-  if ! -e $lockfile23 then
-   touch $lockfile23
-   #fits
-   #cleanfits
-   echo =================
-   echo cronjobcatscience_23 started at `date`
-   science
-   echo DETECTALL SCIENCE
-   source $scr/detectall_xx 23 | grep -v present
-   \rm $lockfile23
-   echo ===== Finished science23 at `date` 
-  else
-   echo ====== lock File found - not started at `date`
-  endif
- endif
-
- if `ps aux | grep md0_res | grep "\[" |wc -l` then
-  echo ===XXXXXXX=== md0_resync in progress. Queuing science45 job
-  set lockfile45 = ~/viskomcatscience_45-lock
-  if ! -e $lockfile45 then
-   touch $lockfile45
-   #fits
-   #cleanfits
-   echo =================
-   echo cronjobcatscience_45 started at `date`
-   science
-   echo DETECTALL SCIENCE
-   source $scr/detectall_xx 45 | grep -v present
-   \rm $lockfile45
-   echo ===== Finished science45 at `date` 
-  else
-   echo ====== lock File found - not started at `date`
-  endif
- endif
-
  \rm $lockfile
 else
  echo ====== lock File found - not started at `date`

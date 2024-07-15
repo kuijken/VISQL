@@ -2,17 +2,10 @@
 
 viskom
 
-if `ps aux | grep md0_res | grep "\[" |wc -l` then
- echo ===XXXXXXX=== md0_resync in progress. Not starting at `date` ===
- exit
-endif
-
 set lockfile = ~/viskomcatscience_45-lock
 
 if ! -e $lockfile then
  touch $lockfile
- #fits
- #cleanfits
  echo =================
  echo cronjobcatscience_45 started at `date`
  echo SORTDATA
