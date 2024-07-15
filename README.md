@@ -1,5 +1,7 @@
 # VISQL
+
 Quick-look analysis of Euclid-VIS raw fits files
+
 K.Kuijken, 2023-2024
 
 
@@ -11,6 +13,7 @@ All code is wrapped by tcsh scripts.
 Copy dot.p3start to .p3start in home directory to define a few p3 startup modules
 The following modules are imported by various scripts:
 
+<pre>
 from astropy.coordinates import get_sun
 from astropy.table import Table
 from astropy.time import Time
@@ -38,26 +41,32 @@ import os
 import os 
 import os, requests
 import time
+</pre>
 
 the Gaiaphotom scripts use custom match.py and angsep.py from Henry Ferguson.
 
 ---------
 
+The code copies all fits files to a single directory, and soft-links the fits files to folders for the different types of data (bias, science, etc.)
+All folders live under a single top-level directory, pointed to by the environment variable $viskom, which you need to configure by hand in the 'viskom' script.
+
 Make sure that the toplevel directory is set to $viskom, and in that directory do
 mkdir FITS BIAS CHARGE DARK FLAT SCIENCE GAIAPHOTOM
 
-copy the contents of all cronjobs/* directories to the src directory (do not make subdirectories, all code should live in $viskom/src/ ). Some files are duplicated, you should be able to select only the ones you want.
+copy the contents of all cronjobs/* directories to the src directory (do not make subdirectories, all code should live in $viskom/src/ ). 
+Some files are duplicated, you should be able to select only the ones you want.
 
-The hierarchy is:
+The hierarchy of processing is as follows (so that e.g., catproc requires setyyyymm, dleas and sciencexy):
 
 setyyyymm, dleas
     sciencexy
         catproc
-	    psf, gaiaphotom
+	    psf
+                gaiaphotom
     darketc
     png
 
-xmovie combines results from png, catproc and darketc
+xmovie combines results from png, catproc and darketc.
 
 ---------
 
