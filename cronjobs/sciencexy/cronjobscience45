@@ -1,0 +1,30 @@
+#!/bin/tcsh
+
+viskom
+
+if `ps aux | grep md0_res | grep "\[" |wc -l` then
+ echo ===XXXXXXX=== md0_resync in progress. Not starting at `date` ===
+ exit
+endif
+
+set lockfile = ~/viskomcatscience_45-lock
+
+if ! -e $lockfile then
+ touch $lockfile
+ #fits
+ #cleanfits
+ echo =================
+ echo cronjobcatscience_45 started at `date`
+ echo SORTDATA
+ foreach yyyymm (`cat $scr/yyyymm`)
+  sortdata $yyyymm
+ end
+ science
+ echo DETECTALL SCIENCE
+ source $scr/detectall_xx 45 | grep -v present
+ \rm $lockfile
+ echo ===== Finished at `date` 
+else
+ echo ====== lock File found - not started at `date`
+endif
+

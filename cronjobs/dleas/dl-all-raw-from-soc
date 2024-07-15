@@ -1,0 +1,19 @@
+
+if $# == 1 then
+ set dddd = $1
+else
+ set dddd = 202
+endif
+
+fits
+
+# the file le1-vs-iws.txt translates the EAS file names to IWS name
+# update it with the query_eas script
+
+# do not download more than 99 files in one session, in case disk space runs out
+
+echo 0 > $viskom/dlcount
+
+foreach soc (`grep $dddd le1-vs-iws.txt | awk '{print $1}' `)
+ if (`cat $viskom/dlcount` < 100) source $viskom/scr/dl-raw-from-soc $soc 
+end

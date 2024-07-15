@@ -1,0 +1,34 @@
+if $# > 0 then
+
+foreach p ($*)
+ set pp = `echo $p|sed 's/.png//'`
+ if ! -e {$pp}.nowcs then  # dont process failed earlier attempts
+  if ! -e {$pp}.wcs then   # dont process existing solved case
+   solve-field -z 2 \
+    -L 0.8 -H 0.9 \
+    -N none \
+    -R none \
+    -M none \
+    -S none \
+    -B none \
+    --parity neg \
+    --no-plots \
+    --crpix-x 600 --crpix-y 577 \
+    --config /home/kuijken/data/astrometry/astrometry.cfg \
+    $p |grep -v "did not solve"
+   if ! -e {$pp}.wcs then   # flag when there is no solution and clean up
+    touch {$pp}.nowcs
+    \rm {$pp}.axy
+   else                     # clean up files produced with solution
+    \rm {$pp}-indx.xyls {$pp}.axy
+   endif
+#  else                      # report was already solved
+#   echo {$pp}.wcs file already present
+  endif
+# else                       # report was already attempted unsuccesfully
+#  echo {$pp}.nowcs file found - not attempting again
+ endif
+end
+endif
+
+#rotation angle = ( arctan2(cd1_2,cd1_1) - arctan2(cd2_1,cd2_2) )/2

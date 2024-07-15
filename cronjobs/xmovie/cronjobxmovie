@@ -1,0 +1,55 @@
+#!/bin/tcsh
+
+viskom
+
+if `ps aux | grep md0_res | grep "\[" |wc -l` then
+ echo ===XXXXXXX=== md0_resync in progress. Not starting at `date` ===
+ exit
+endif
+
+set lockfile = ~/viskomxmovie-lock
+
+if ! -e $lockfile then
+ touch $lockfile
+ echo =================
+ echo cronjobxmovie started at `date`
+ xray
+ if `uname` == "Darwin" then
+  set yesterday = `date -v-1d +"%Y %m %d"`
+  set daybeforeyesterday = `date -v-2d +"%Y %m %d"`
+  set day2beforeyesterday = `date -v-3d +"%Y %m %d"`
+ else
+  set yesterday = `date --date='yesterday' +"%Y %m %d"`
+  set daybeforeyesterday = `date --date='2 days ago' +"%Y %m %d"`
+  set day2beforeyesterday = `date --date='3 days ago' +"%Y %m %d"`
+ endif
+ set today = `date +"%Y %m %d"`
+ source $scr/getgoes $day2beforeyesterday
+ source $scr/getgoes $daybeforeyesterday
+ source $scr/getgoes $yesterday
+ source $scr/getgoes $today
+ \rm `find . -size 0 -name "goes*.txt"`
+# \rm `find . -size -35k -name "*goes.png"`
+ source $scr/mkangxfile
+ #source $scr/mk3panelXmovie 202307
+ #source $scr/mk3panelXmovie 202308
+ #source $scr/mk3panelXmovie 202309
+ #source $scr/mk3panelXmovie 202310
+ # clean up goes plots that are probably out of date
+ \rm       C_`echo $day2beforeyesterday|sed 's/ //g'`*goes.png \
+    FRAMES/TMPC_`echo $day2beforeyesterday|sed 's/ //g'`*.png \
+           C_`echo $daybeforeyesterday|sed 's/ //g'`*goes.png \
+    FRAMES/TMPC_`echo $daybeforeyesterday|sed 's/ //g'`*.png \
+           C_`echo $yesterday|sed 's/ //g'`*goes.png \
+    FRAMES/TMPC_`echo $yesterday|sed 's/ //g'`*.png \
+           C_`echo $today|sed 's/ //g'`*goes.png \
+    FRAMES/TMPC_`echo $today|sed 's/ //g'`*.png
+ foreach yyyymm (`cat $scr/yyyymm`)
+  source $scr/mk3panelXmovie $yyyymm
+ end
+ \rm $lockfile
+ echo ===== Finished at `date` 
+else
+ echo ===== lock File found - not started at `date`
+endif
+

@@ -1,0 +1,41 @@
+Xvfb :9 -screen 0 2000x2000x24&
+
+if $# == 0 then
+ set mkyyyy = `date -v-1d +"%Y%m%d"`
+else
+ set mkyyyy = $1
+endif
+
+if `find . -name "C_"$mkyyyy"*.VIS.*.fits"` != "" then
+foreach fitsfile (C_$mkyyyy*.VIS.*.fits)
+ set thumb = `basename $fitsfile|sed 's/.fits/.png/'`
+ if ! -e $thumb then
+  ds9 -display :9.0 -geometry 1200x1434 -zscale -mosaicimage $fitsfile -zoom 0.04 -saveimage $thumb -quit
+  echo `basename $cwd` $thumb made.
+ else
+  echo `basename $cwd` $thumb already present - not overwritten.
+ endif
+ set thumb = `basename $fitsfile|sed 's/.fits//'`
+ if ! -e {$thumb}_tr.png then
+  ds9 -display :9.0 -geometry 900x1134 -zscale -mosaicimage $fitsfile \
+  -pan to  2000  2000 detector -saveimage {$thumb}_ll.png \
+  -pan to  2000 15000 detector -saveimage {$thumb}_cl.png \
+  -pan to  2000 25900 detector -saveimage {$thumb}_tl.png \
+  -pan to 12600  2000 detector -saveimage {$thumb}_lc.png \
+  -pan to 12600 15000 detector -saveimage {$thumb}_cc.png \
+  -pan to 12600 25900 detector -saveimage {$thumb}_tc.png \
+  -pan to 23150  2000 detector -saveimage {$thumb}_lr.png \
+  -pan to 23150 15000 detector -saveimage {$thumb}_cr.png \
+  -pan to 23150 25900 detector -saveimage {$thumb}_tr.png \
+  -quit
+  echo `basename $cwd` ${thumb}_XX.png 3x3 zooms made.
+ else
+  echo `basename $cwd` {$thumb}_tr.png already present - not overwritten.
+ endif
+end
+endif
+
+killall Xvfb
+sleep 1
+
+echo --- all thumbs and zooms done in `basename $cwd` ---

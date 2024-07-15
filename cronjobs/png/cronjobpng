@@ -1,0 +1,31 @@
+#!/bin/tcsh
+
+viskom
+
+#if `ps aux | grep md0_res | grep "\[" |wc -l` then
+# echo ===XXXXXXX=== md0_resync in progress. Not starting at `date` ===
+# exit
+#endif
+
+set lockfile = ~/viskompng-lock
+
+if ! -e $lockfile then
+ touch $lockfile
+ echo =================
+ echo cronjobpng started at `date`
+ #fits
+ #cleanfits
+ foreach yyyymm (`cat $scr/yyyymm`)
+  echo SORTDATA $yyyymm
+  sortdata $yyyymm
+  mkallpng $yyyymm | grep -v overwritt |& grep -v Warning
+  science
+  echo ASTROMETRY.NET $yyyymm
+  getastrom C_$yyyymm*01.png |grep -v file
+ end
+ \rm $lockfile
+ echo ===== Finished at `date` 
+else
+ echo ===== lock File found - not started at `date`
+endif
+

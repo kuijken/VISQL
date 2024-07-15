@@ -1,0 +1,53 @@
+#!/bin/tcsh
+
+viskom
+
+#if `ps aux | grep md0_res | grep "\[" |wc -l` then
+# echo ===XXXXXXX=== md0_resync in progress. Not starting at `date` ===
+# exit
+#endif
+
+set lockfile = ~/viskomcatproc-lock
+
+if ! -e $lockfile then
+ touch $lockfile
+ #fits
+ #cleanfits
+ echo =================
+ echo cronjobcatproc started at `date`
+ #echo SORTDATA
+ #sortdata
+ science
+ #echo DETECTALL SCIENCE
+ #detectall | grep -v present
+ #echo FINDCHIMNEY
+ #findchimney | grep -v ALREADY
+ findchimney2 | grep -v ALREADY
+ echo CHIMNEYPLOTS
+ chimneyplots |grep -v overwrit
+ echo COSMIXPLOTS SCIENCE
+ mkcosmiXplots |grep -v already
+# echo COSMICSPLOTS SCIENCE
+# mkcosmicplots | grep -v already
+# echo PROTONPLOTS SCIENCE
+# mkprotonplots | grep -v already
+ #mkstarplots | grep -v already
+ echo STARMOMS    # these also generate starplots at same time
+ mkstarmoms | grep -v already
+ echo STARPLOTS   # probably obsolete
+ mkstarplots2 | grep -v already
+ echo STARMOMMAPS
+ mkstarmomentsmaps | grep -v already
+ #dark
+ #echo DETECTALL DARK
+ #detectalldark | grep -v present
+ #echo COSMIXPLOTS DARK
+ #mkcosmiXplots | grep -v already
+ #echo COSMICPLOTS DARK
+ #mkcosmicplots | grep -v already
+ \rm $lockfile
+ echo ===== Finished at `date` 
+else
+ echo ====== lock File found - not started at `date`
+endif
+

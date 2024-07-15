@@ -1,0 +1,17 @@
+foreach yyyymm (`cat $scr/yyyymm`)
+foreach fitsfile (C_$yyyymm*fits)
+ set cat = `basename $fitsfile |sed 's/.fits/.cat.gz/'`
+ if ! -e $cat then
+  echo $cat NOT FOUND.
+ else 
+  set s = `basename $fitsfile |sed 's/.fits/_stars2.cat/'`
+  if -e $s then
+   echo $s ALREADY EXISTS.
+  else
+   zcat $cat | awk `p3 $scr/findchimney2flat.py $cat` '$3>fmin && $3<fmax && $5>rmin && $5<rmax && $7>bmin' >$s
+   echo $s star cat created.
+  endif
+ endif
+end
+end
+

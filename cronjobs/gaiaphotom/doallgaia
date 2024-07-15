@@ -1,0 +1,13 @@
+
+cd $viskom/GAIAPHOTOM
+
+# find new moments catalogues and copy them into the GAIAPHOTOM directory, make _frat.txt files.
+source $scr/getmomcats $yyyymm
+
+# if there are new _frat.txt files then remake all plots
+if `find . -name C_{$yyyymm}"*frat.txt"` != "" then
+ if `ls -t iceplot_long.png C_{$yyyymm}*frat.txt | head -1` != iceplot_long.png then
+  source $scr/plotice
+ endif
+endif
+

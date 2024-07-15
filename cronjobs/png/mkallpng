@@ -1,0 +1,22 @@
+set c = $cwd
+
+set yyyymm = $1
+
+science
+echo SCIENCE PNGs
+source ../scr/mkallthumbszooms $yyyymm
+bias
+echo BIAS PNGs
+source ../scr/mkallthumbs $yyyymm
+dark
+echo DARK PNGs
+source ../scr/mkallthumbs $yyyymm
+flat
+echo FLAT PNGs
+source ../scr/mkallthumbszooms $yyyymm
+charge
+echo CHARGE PNGs
+source ../scr/mkallthumbs $yyyymm
+
+cd $c
+

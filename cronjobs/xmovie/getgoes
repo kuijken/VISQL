@@ -1,0 +1,12 @@
+set c = $cwd
+
+xray
+
+set allgoes = AllGOES.txt
+\rm -f `find . -size 0 -name "goes*.txt"`
+p3 $scr/getgoes.py $*
+echo \# t_euclid_sec GOES_X > $allgoes
+cat goes*txt >> $allgoes
+\rm -f `find . -size 0 -name "goes*.txt"`
+
+cd $c

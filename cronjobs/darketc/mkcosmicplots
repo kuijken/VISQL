@@ -1,0 +1,12 @@
+
+foreach yyyymm (`cat $scr/yyyymm`)
+foreach cat (C_$yyyymm*01.cat.gz)
+ set cosmicplot = `basename $cat|sed 's/.cat.gz/_cosmics.png/'`
+ if -e $cosmicplot then
+  echo $cosmicplot already exists.
+ else
+  p3 $scr/plotcosmics.py $cat
+  echo $cosmicplot made.
+ endif
+end
+end

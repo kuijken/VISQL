@@ -1,0 +1,20 @@
+flat
+
+foreach yyyymm (`cat $scr/yyyymm`)
+foreach fitsfile (C_$yyyymm*.fits)
+ set n = `basename $fitsfile | sed 's/.fits//'`
+ set cat = {$n}.cat
+ if ! -e {$cat}.gz then
+  set tmpcat = TMP{$n}.cat
+  sex $fitsfile -DETECT_THRESH 1.5 -VERBOSE_TYPE QUIET -CATALOG_NAME $tmpcat >&/dev/null
+  # unwrap coordinates around RA=0 and throw out obvious junk
+  awk '$3>0 && $5>0 && $5<15{x=($1+180)%360 - 180; r=(x*x+$2*$2)**0.5;print x,$2,$3,$4,$5,$6,$7,$8,$9,$10,r}' $tmpcat > $tmpcat.2
+  gzip $tmpcat.2
+  mv $tmpcat.2.gz $cat.gz
+  echo Catalog {$cat}.gz made.
+  \rm $tmpcat
+ else
+  echo Catalog {$cat}.gz is already present.
+ endif
+end
+end

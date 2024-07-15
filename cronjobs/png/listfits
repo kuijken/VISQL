@@ -1,0 +1,36 @@
+set c = $cwd
+
+set fitslockfile = ~/fitslist-lock
+
+if -e $fitslockfile then
+ echo $fitslockfile found - fitslist not updated
+else
+ touch $fitslockfile
+ fits
+ touch fitslist.txt # in case start from scratch, create empty fitslist.txt
+ # find fits files that are present but not in fitslist.txt
+ awk '{print $1}' fitslist.txt |grep C_202  > tmpoldfitsfiles.txt
+ 
+# find all fits files that are not yet in fitslist.txt, but also not very recently modified (may be still downloading)
+find . -name "C*.fits" -mmin -1  | sed 'sx./xx' > tmpverynewfiles.txt
+\ls |grep "\.fits" |grep -v gz | grep -v -f tmpoldfitsfiles.txt | grep -v -f tmpverynewfiles.txt |grep -v XC > tmpnewfitsfiles.txt
+
+
+wc -l tmp???fitsfiles.txt
+
+ #
+ # if there are new files, run dfits on them and rebuild fitslist.txt
+ if ! -z tmpnewfitsfiles.txt then
+  dfits `cat tmpnewfitsfiles.txt` | fitsort -d DATE-OBS EXPTIME IMG_T1 IMG_T2 | awk 'NF>=3' > tmpnewfitslist.txt
+  cat fitslist.txt tmpnewfitslist.txt | grep C_202 | grep -v XC | sort |uniq > aaa
+  echo \# FITSNAME DATE-OBS EXPTIME IMG_T1 IMG_T2 > fitslist.txt
+  cat aaa >>fitslist.txt
+  \rm tmp*txt aaa
+  echo FITS/fitslist.txt created
+ else
+  echo fitslist.txt was complete.
+ endif
+ \rm $fitslockfile
+endif
+
+cd $c

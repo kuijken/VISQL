@@ -1,0 +1,53 @@
+set c = $cwd
+
+science
+foreach yyyymm (`cat $scr/yyyymm`)
+foreach f (C_$yyyymm*.fits)
+ set p = `basename $f|sed 's/.fits/_stars_mom.cat/'`
+ set p2  = `basename $f|sed 's/.fits/_stars2_mom.cat/'`
+ set p50 = `basename $f|sed 's/.fits/_stars_mom50.cat/'`
+ set p75 = `basename $f|sed 's/.fits/_stars_mom75.cat/'`
+ set cat = `basename $f|sed 's/.fits/_stars.cat/'`
+ set cat2 = `basename $f|sed 's/.fits/_stars2.cat/'`
+#  if -e $cat then
+#   if -e $p then
+#    echo Star moments file $p already exists
+#   else
+#    p3 $scr/starmeasures.py $f > tmpmomcat$f
+#    mv tmpmomcat$f $p
+#    echo Star moments catalogue $p done with `wc -l $p|cut -d \  -f 1` stars
+#   endif
+#   if -e $p50 then
+#    echo Star moments file $p50 already exists
+#   else
+#    p3 $scr/starmeasures05.py $f > tmpmomcat$f
+#    mv tmpmomcat$f $p50
+#    echo Star moments catalogue $p50 done with `wc -l $p|cut -d \  -f 1` stars
+#   endif
+# #### Skip 0.75 arcsec aperture measurements as too much affected by cosmic rays
+# #  if -e $p75 then
+# #   echo Star moments file $p75 already exists
+# #  else
+# #   p3 $scr/starmeasureswide.py $f > tmpmomcat$f
+# #   mv tmpmomcat$f $p75
+# #   echo Star moments catalogue $p75 done with `wc -l $p|cut -d \  -f 1` stars
+# #  endif
+#  else
+#   echo Found no star catalogue file $cat
+#  endif
+ if -e $cat2 then
+  if -e $p2 then
+   echo Star moments file $p2 already exists
+  else
+#   p3 $scr/starmeasures_2.py $f > tmpmomcat$f
+   p3 $scr/starfield2_with_measures.py $f > tmpmomcat$f
+   mv tmpmomcat$f $p2
+   echo Star moments catalogue $p2 done with `wc -l $p2|cut -d \  -f 1` stars
+  endif
+ else
+  echo Found no star catalogue file $cat2
+ endif
+end
+end
+
+cd $c

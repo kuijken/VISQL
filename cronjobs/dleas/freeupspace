@@ -1,0 +1,9 @@
+fits
+
+ls -r `find . -name "*fits" -type f` |tail -1 |cut -c 3-12 > oldest.txt
+set nn = `cat oldest.txt`
+echo Will move fits files from $nn
+cp -pnv $nn*fits ../shear16/FITS/
+ln -sf ../shear16/FITS/$nn*fits .
+echo Replaced fits files from $nn with soft links to amsteldiep
+df -h .

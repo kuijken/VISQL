@@ -1,0 +1,76 @@
+
+# make a movie for all science and dark frames with timestamp that contains $1
+# and for which a cosmiX plot has been made.
+
+xray
+
+# this code cleans out recent plots of the goes flux that may be incomplete.
+# But better filter this elsewhere before calling mk3panelXmovie
+#
+#set lastgoes = `find . -mmin -600 -name "goes*txt" | sed -e 's/.*oes//' -e 's/.txt//'`
+#if $lastgoes != "" then
+# foreach yyyymmdd ($lastgoes)
+#  echo Removing outdated goes plots for $yyyymmdd .
+#  \rm C_{$yyyymmdd}_*goes.png FRAMES/TMPC_{$yyyymmdd}_*X.png
+#endif
+
+p3 $scr/plotgoes24h.py
+
+science
+
+p3 $scr/rfdiagram.py *$1*.cat.gz
+
+
+foreach im (0a `find . -name "C*"$1"*_cosmiX.png" | sed 'sx./xx'|sort`)
+ if ! -e ../XRAY/FRAMES/TMP$im then
+  set rf = `echo $im|sed 's/_cosmiX.png/_rf.png/'`
+  set goes = `echo $im|sed 's/_cosmiX.png/_goes.png/'`
+  magick \( -page +5+0 ../XRAY/$goes \) \( -page +600+0 $im \) \( -page +1200+0 $rf \) -layers mosaic ../XRAY/FRAMES/TMP$im
+  echo Frame made for $im
+ endif
+end
+
+dark
+
+p3 $scr/rfdiagram.py *$1*.cat.gz
+
+foreach im (0a `find . -name "C*"$1"*_cosmiX.png" | sed 'sx./xx'|sort`)
+ if ! -e ../XRAY/FRAMES/TMP$im then
+  set rf = `echo $im|sed 's/_cosmiX.png/_rf.png/'`
+  set goes = `echo $im|sed 's/_cosmiX.png/_goes.png/'`
+  magick \( -page +5+0 ../XRAY/$goes \) \( -page +600+0 $im \) \( -page +1200+0 $rf \) -layers mosaic ../XRAY/FRAMES/TMP$im
+  echo Frame made for $im
+ endif
+end
+
+xray
+echo BUILDING MOVIE FROM `ls -1 FRAMES/TMP*$1*cosmiX.png|wc -l` FRAMES
+
+if `ls -t1 FRAMES/TMP*{$1}0*cosmiX.png            FRAMES/TMP*{$1}10*cosmiX.png XCOSMIX{$1}a.mpg | head -1` != XCOSMIX{$1}a.mpg then
+ echo Building XCOSMIX{$1}a.mpg
+ #convert -delay 50 FRAMES/TMP*{$1}0*cosmiX.png    FRAMES/TMP*{$1}10*cosmiX.png         XCOSMIX{$1}a.mpg
+ magick FRAMES/TMP*{$1}0*cosmiX.png    FRAMES/TMP*{$1}10*cosmiX.png         XCOSMIX{$1}a.mpg
+ chmod +r XCOSMIX{$1}a.mpg
+endif
+if `ls -t1 FRAMES/TMP*{$1}1[123456789]*cosmiX.png FRAMES/TMP*{$1}20*cosmiX.png XCOSMIX{$1}b.mpg | head -1` != XCOSMIX{$1}b.mpg then
+ echo Building XCOSMIX{$1}b.mpg
+ #convert -delay 50 FRAMES/TMP*{$1}1[123456789]*cosmiX.png FRAMES/TMP*{$1}20*cosmiX.png XCOSMIX{$1}b.mpg
+ magick FRAMES/TMP*{$1}1[123456789]*cosmiX.png FRAMES/TMP*{$1}20*cosmiX.png XCOSMIX{$1}b.mpg
+ chmod +r XCOSMIX{$1}b.mpg
+endif
+if `ls -t1 FRAMES/TMP*{$1}2[123456789]*cosmiX.png FRAMES/TMP*{$1}3*cosmiX.png  XCOSMIX{$1}c.mpg | head -1` != XCOSMIX{$1}c.mpg then
+ echo Building XCOSMIX{$1}c.mpg
+ #convert -delay 50 FRAMES/TMP*{$1}2[123456789]*cosmiX.png FRAMES/TMP*{$1}3*cosmiX.png  XCOSMIX{$1}c.mpg
+ magick FRAMES/TMP*{$1}2[123456789]*cosmiX.png FRAMES/TMP*{$1}3*cosmiX.png  XCOSMIX{$1}c.mpg
+ chmod +r XCOSMIX{$1}c.mpg
+endif
+
+#convert -delay 50 FRAMES/TMP*$1*cosmiX.png XCOSMIX$1.mpg
+#convert FRAMES/TMP*$1*cosmiX.png XCOSMIX$1.mpg
+#chmod +r XCOSMIX$1.mpg
+
+echo BUILDING MOVIE OF PROTONS IN SCIENCE EXPOSURES
+
+#convert -delay 50 $viskom/SCIENCE/C_$1*protons.png PROTONS$1.mpg
+magick $viskom/SCIENCE/C_$1*protons.png PROTONS$1.mpg
+chmod +r PROTONS$1.mpg

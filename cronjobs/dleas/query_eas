@@ -1,0 +1,30 @@
+# query last 2 weeks of DpdVisRawFrames and get their RawFile name
+# append the result to existing FITS/le1-vs-iws.txt file 
+
+# get date for 2 weeks ago - this is how far back to query
+if `uname` == Darwin then
+set dd = `date -v -2w +"("%Y,%m,%d")"`
+else
+set dd = `date -d "2 weeks ago" +"("%Y,%m,%d")"`
+endif
+
+# For a clean reset set dd to launch date:
+# set dd = "(2024,7,1)"
+
+# note that date queries need to be written as python datetime objects
+#     using dt as alias for datetime
+
+curl -n "https://eas-dps-rest-ops.esac.esa.int/REST?class_name=DpdVisRawFrame&Header.ManualValidationStatus!=INVALID&project=EUCLID&fields=Header.ProductId.LimitedString:Data.InputRawFiles.RawFile&allow_array=True&Header.CreationDate>dt$dd" | \
+sed 's/\"//g' | \
+sort |grep EUC > EAS-output.txt
+dos2unix EAS-output.txt
+awk '{split($1,s,","); print(s[1],s[2]".bin"substr(s[1],46,6)".fits")}' EAS-output.txt \
+> $viskom/FITS/le1-vs-iws-latest.txt
+
+# merge last months' files into existing list
+if -e $viskom/FITS/le1-vs-iws.txt then
+  cat $viskom/FITS/le1-vs-iws.txt $viskom/FITS/le1-vs-iws-latest.txt | sort -k 2 | uniq > $viskom/FITS/aaa
+  \mv -f $viskom/FITS/aaa $viskom/FITS/le1-vs-iws.txt
+else
+  \mv $viskom/FITS/le1-vs-iws-latest.txt $viskom/FITS/le1-vs-iws.txt
+endif

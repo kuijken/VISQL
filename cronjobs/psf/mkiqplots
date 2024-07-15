@@ -1,0 +1,7 @@
+foreach starcat ($*)
+ set im = `echo $starcat| sed 's/_stars.*//'`
+ if ! -e {$im}_iq.png then
+  source $scr/iqplot $im
+  echo Made {$im}_iq.png
+ endif
+end

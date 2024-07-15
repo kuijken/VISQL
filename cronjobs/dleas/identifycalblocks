@@ -1,0 +1,7 @@
+
+cd $viskom/FITS
+
+dfits C_$1*.fits | fitsort CALBLKID CALBLKVR DITHOBS RA DEC PA SAA ALPHA EXPTIME IMG_T1 IMG_T2 OBS_ID > tmplist
+\mv tmplist fitslist$1.txt
+
+ # rsync -auv --no-links *txt ~/data/VISCOMM/FITS/

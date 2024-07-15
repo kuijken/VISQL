@@ -1,0 +1,23 @@
+set c = $cwd
+
+science
+foreach yyyymm (`cat $scr/yyyymm`)
+foreach f (C_$yyyymm*.fits)
+ set p = `basename $f|sed 's/.fits/_stars2.png/'`
+ set cat = `basename $f|sed 's/.fits/_stars2.cat/'`
+ if -e $p then
+  echo Star field plot $p already exists
+ else if -e $cat then
+  if ! -z $cat then
+   p3 $scr/starfield2.py $f
+   echo Star field $p done.
+  else
+   echo Star cat $cat empty.
+  endif
+ else
+  echo No catalogue file found for $f
+ endif
+end
+end
+
+cd $c

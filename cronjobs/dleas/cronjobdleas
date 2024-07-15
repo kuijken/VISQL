@@ -1,0 +1,40 @@
+#!/bin/tcsh
+
+viskom
+
+set lockfile = ~/viskomdleas-lock
+
+# set $yesterday and $today with appropriate date command
+#
+if `uname` == "Darwin" then
+ set yesterday = `date -v-1d +"%Y-%m-%d"`
+else
+ set yesterday = `date --date='yesterday' +"%Y-%m-%d"`
+endif
+set today     = `date +"%Y-%m-%d"`
+
+if ! -e $lockfile then
+ touch $lockfile
+ echo =================
+ echo cronjobdleas started at `date`
+ source $scr/query_eas
+ fits
+ set diskspace = `df -m . | tail -1 | awk '{print $4}'`
+ if ($diskspace < 500000) source $scr/freeupspace
+ find . -size 0 -name "*.fits" -delete
+ foreach dlyyyymm (`cat $scr/yyyymm`)
+  source $scr/dl-all-raw-from-soc $dlyyyymm
+  find . -size 0 -name "*.fits" -delete
+  source $scr/dl-all-raw-from-soc $dlyyyymm
+  source $scr/identifycalblocks $dlyyyymm
+  sleep 60
+ end
+ fits
+ \rm $lockfile
+ echo Ended at `date`.
+ echo ================
+else
+ echo ====== lock File found - not started at `date`
+endif
+
+

@@ -1,0 +1,40 @@
+foreach yyyymm (`cat $scr/yyyymm`)
+foreach c (C_$yyyymm*0[0-9].cat.gz)
+ set starscat = `basename $c | sed 's/.cat.gz/_stars.cat/'`
+# set chimney = `basename $c | sed 's/.cat.gz/_chimney.jpg/'`
+# set chimney2 = `basename $c | sed 's/.cat.gz/_chimney2.jpg/'`
+# set chimney3 = `basename $c | sed 's/.cat.gz/_stars_chimney.jpg/'`
+ set chimney4 = `basename $c | sed 's/.cat.gz/_chimney4.png/'`
+# if -e $chimney2 then
+#  echo $chimney2 exists - not overwritten
+# else
+#  zcat $c | awk '$5<2.5 && $5>0.6 && $3>2000 && $7>1.1' | colplotps - 5 FLUXRAD -3 FLUX `basename $c`
+#  convert colplot.ps $chimney2
+#  \rm colplot.ps
+#  echo $chimney2 done.
+# endif
+# if -e $chimney then
+#  echo $chimney exists - not overwritten
+# else
+#  zcat $c | awk '$5<6 && $7>1.1' | colplotps - 5 FLUXRAD -3 FLUX `basename $c`
+#  convert colplot.ps $chimney
+#  \rm colplot.ps
+#  echo $chimney done.
+# endif
+# if -e $chimney3 then
+#  echo $chimney3 exists - not overwritten
+# else if ! -e $starscat then
+#  echo $starscat NOT FOUND.
+# else 
+#  colplotps $starscat 5 FLUXRAD -3 FLUX `basename $starscat`
+#  convert colplot.ps $chimney3
+#  \rm colplot.ps
+#  echo $chimney3 done.
+# endif
+ if -e $chimney4 then
+  echo $chimney4 exists - not overwritten
+ else
+  p3 $scr/chimney.py $c
+ endif
+end
+end

@@ -1,0 +1,10 @@
+import numpy as np
+import numpy.random as rnd
+import matplotlib.pyplot as plt
+from matplotlib import use,get_backend
+#from units import *
+import astropy.io.fits as pf
+#print('Loaded numpy, pyplot, pyfits, units')
+print('Loaded numpy, pyplot, pyfits')
+use('macosx')
+print('Using',get_backend(),'matplotlib backend.')

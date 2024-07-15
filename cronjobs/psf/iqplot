@@ -1,0 +1,7 @@
+# plot mom_map3, thubnail, and chimney plots on one canvas
+
+set im = $1
+
+magick \( -page +5+0 {$im}_stars2_mom_map3.png \) \( {$im}_tr.png -page +580+0 \) \( {$im}_chimney2.png -fill yellow -draw "line 189,100 189,400" -page +580+0 \) -layers mosaic {$im}_iq.png
+
+

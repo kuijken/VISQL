@@ -1,0 +1,12 @@
+#!/bin/tcsh
+
+viskom
+
+# set the yyyymm variable(s) here since this job only runs once per day
+# go back up to 3 days to allow for late data or lost processing days
+
+(date --date='3 days ago' +"%Y%m" ;date  +"%Y%m") | uniq > $scr/yyyymm
+
+echo `date` Set yyyymm to:
+cat $scr/yyyymm
+

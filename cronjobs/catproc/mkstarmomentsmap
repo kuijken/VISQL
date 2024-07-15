@@ -1,0 +1,33 @@
+set c = $cwd
+
+science
+
+foreach yyyymm (`cat $scr/yyyymm`)
+
+#foreach f (*2023$mm*stars_mom.cat *2023$mm*stars2_mom.cat *2023$mm*stars_mom50.cat)
+### skip 0.75 arcsec apertures because of cosmics
+
+foreach f (C_$yyyymm*stars2_mom.cat)
+ set cat = `basename $f`
+ if -z $cat then
+  echo $cat is empty.
+ else  
+  set p = `echo $cat|sed 's/.cat/.png/'`
+  if -e $p then
+   echo Star moments map $p already exists
+  else
+   p3 $scr/starmomentsmap.py $cat
+   echo Star moments map $p done.
+  endif
+  set p = `echo $cat|sed 's/.cat/_map3.png/'`
+  if -e $p then
+   echo Star moments map $p already exists
+  else
+   p3 $scr/starmomentsmap3.py $cat
+   echo Star moments map $p done.
+  endif
+ endif
+end
+end
+
+cd $c

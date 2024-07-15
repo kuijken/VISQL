@@ -1,0 +1,40 @@
+set dd = $1
+
+set c = $cwd
+
+# don't move small fits files as they may be compressed!
+#fits
+#mkdir INCOMPLETE
+#mv `find . -size -1200M -name "*.fits"` INCOMPLETE/
+
+fits
+listfits
+
+dark
+#ln -s `dfits ../FITS/*fits | fitsort -d IMG_T1 | grep DARK | cut -f 1` .
+ln -s `grep DARK ../FITS/fitslist.txt | grep C_$dd | awk '{print "../FITS/"$1}'` . >&/dev/null
+flat
+#ln -s `dfits ../FITS/*fits | fitsort -d IMG_T1 | grep FLAT | cut -f 1` .
+ln -s `grep FLAT ../FITS/fitslist.txt | grep C_$dd | awk '{print "../FITS/"$1}'` . >&/dev/null
+bias
+#ln -s `dfits ../FITS/*fits | fitsort -d IMG_T1 | grep BIAS | cut -f 1` .
+ln -s `grep BIAS ../FITS/fitslist.txt | grep C_$dd | awk '{print "../FITS/"$1}'` . >&/dev/null
+science
+#ln -s `dfits ../FITS/*fits | fitsort -d IMG_T1 | grep SURVEY | cut -f 1` .
+ln -s `grep SURV ../FITS/fitslist.txt | grep C_$dd | awk '{print "../FITS/"$1}'` . >&/dev/null
+ln -s `grep SELF_CAL ../FITS/fitslist.txt | grep C_$dd | awk '{print "../FITS/"$1}'` . >&/dev/null
+ln -s `grep C_$dd ../FITS/fitslist.txt  | awk '$3>10 && $4=="OTHER" && $5=="OTHER"{print "../FITS/"$1}'` . >&/dev/null
+ln -s `grep STD ../FITS/fitslist.txt | grep C_$dd | awk '{print "../FITS/"$1}'` . >&/dev/null
+charge
+#ln -s `dfits ../FITS/*fits | fitsort -d IMG_T1 | grep CHARGE | cut -f 1` .
+ln -s `grep CHARGE ../FITS/fitslist.txt | grep C_$dd | awk '{print "../FITS/"$1}'` . >&/dev/null
+#ln -s `dfits ../FITS/*fits | fitsort -d IMG_T1 | grep TRAP | cut -f 1` .
+ln -s `grep TRAP ../FITS/fitslist.txt | grep C_$dd | awk '{print "../FITS/"$1}'` . >&/dev/null
+
+echo Symbolic links to fits files updated.
+
+#fits
+#mv INCOMPLETE/* .
+#\rmdir INCOMPLETE
+
+cd $c

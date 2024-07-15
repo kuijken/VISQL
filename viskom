@@ -1,0 +1,64 @@
+
+# check whether viskom already defined (then do not change directory at the end)
+if $?viskom then
+ set haveviskom = 1
+endif
+
+# configure this directory
+setenv viskom /top/level/directory/VISCOMM
+
+alias p3 env PYTHONSTARTUP=/Users/kuijken/.p3start python3.10
+
+set scr = $viskom/scr
+
+alias viskom source $scr/viskom
+alias freeupspace source $scr/freeupspace
+
+alias detectalldark source $scr/detectalldark
+alias detectallflat source $scr/detectallflat
+
+alias chimneyplots source $scr/chimneyplots
+
+alias findchimney2 source $scr/findchimney2
+alias findchimney2flat source $scr/findchimney2flat
+
+alias mkstarplots2 source $scr/mkstarplots2
+alias mkstarmoms source $scr/mkstarmoms
+alias mkstarmomentsmaps source $scr/mkstarmomentsmap
+
+alias medianmoments p3 $scr/medianmoments.py
+alias psfsummaries source $scr/psfsummaries
+
+alias mkallpng source $scr/mkallpng
+alias mkallthumbs source $scr/mkallthumbs
+alias getastrom source $scr/getastrom
+
+alias mkcosmicplots source $scr/mkcosmicplots
+alias mkcosmiXplots source $scr/mkcosmiXplots
+alias mkprotonplots source $scr/mkprotonplots
+
+alias sortdata source $scr/sortdata
+alias showfits ds9 -view layout vertical -mosaicimage -zscale -zoom 0.03
+
+alias listfits source $scr/listfits
+
+alias deduceangles source $scr/deduceangles
+
+alias match2cats source $scr/match2starcats
+alias matchseries source $scr/matchseries
+alias matchflatseries source $scr/matchflatseries
+alias match2series source $scr/match2series
+alias matchros source $scr/matchros
+
+alias science cd $viskom/SCIENCE
+alias dark cd $viskom/DARK
+alias flat cd $viskom/FLAT
+alias bias cd $viskom/BIAS
+alias fits cd $viskom/FITS
+alias charge cd $viskom/CHARGE
+alias scr cd $scr
+alias test cd $viskom/TEST
+alias xray cd $viskom/XRAY
+
+# if this is initialisation call then cd to viskom directory
+if (! $?haveviskom) cd $viskom

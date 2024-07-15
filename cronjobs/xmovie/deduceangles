@@ -1,0 +1,35 @@
+# go through all science observations, see whether they have a WCS, and calculate the SAA and ALFA angles.
+
+xray
+
+# use LE1 values where available
+
+foreach yyyymm (`cat $scr/yyyymm`)
+ echo EXTRACTING ANGLES FROM fitslist$yyyymm.txt ...
+ awk 'BEGIN{print("# filename SAA ALPHA PA RA DEC")} ($1!="FILE") && (NF==13) && ($2>0) {print($1,$8,$9,$7-90,$5,$6)}' \
+  ../FITS/fitslist$yyyymm.txt |sed 's/fits/png/' > SAA-ALFA-LE1_$yyyymm.txt
+ cat SAA-ALFA-LE1.txt SAA-ALFA-LE1_$yyyymm.txt | sort |uniq |grep -v filename > aaa
+ (echo \# filename SAA ALPHA PA RA DEC ; cat aaa) > SAA-ALFA-LE1.txt
+end
+
+foreach yyyymm (`cat $scr/yyyymm`)
+ set outfile = SAA-ALFA-recon_$yyyymm.txt
+ 
+ \cp SAA-ALFA-recon_$yyyymm.txt tmpoldangles.txt
+ touch tmpoldangles.txt
+ 
+ echo \# filename SAA ALPHA PA RA DEC > $outfile
+ foreach pp (../SCIENCE/C_$yyyymm*01.png )
+  set ppp = `basename $pp`
+  set sss = `grep $ppp tmpoldangles.txt`      # look for earlier solution
+  if "$sss" == "" then
+   echo $ppp `p3 ../scr/deduceangles.py $ppp` | grep -v "not found" >> $outfile
+  else
+   echo $sss >> $outfile
+  endif
+ end
+ \rm tmpoldangles.txt
+ cat SAA-ALFA-recon.txt SAA-ALFA-recon_$yyyymm.txt | sort |uniq |grep -v filename > aaa
+ (echo \# filename SAA ALPHA PA RA DEC ; cat aaa) > SAA-ALFA-recon.txt
+end
+

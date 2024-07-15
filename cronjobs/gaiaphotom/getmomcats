@@ -1,0 +1,76 @@
+# copy missing moment catalogues to gaia directory
+
+echo `date` Looking for new psf moment catalogues...
+
+set yyyymm = $1
+echo getmomcats $yyyymm
+
+ \rm tocopy.txt
+ # compile all momcats for long and short exposures
+ cat $viskom/FITS/fitslist$yyyymm.txt|awk '(NF==13) && ($10==560.52) && ($8>0){print(substr($1,1,42)"_stars2_mom.cat")}' > momcatlist.txt
+ cat $viskom/FITS/fitslist$yyyymm.txt|awk '(NF==13) && ($10==89.52) && ($8>0){print(substr($1,1,42)"_stars2_mom.cat")}' >> momcatlist.txt
+ cat $viskom/FITS/fitslist$yyyymm.txt|awk '(NF==12) && ($9==560.52) && ($7>0){print(substr($1,1,42)"_stars2_mom.cat")}' >> momcatlist.txt
+ cat $viskom/FITS/fitslist$yyyymm.txt|awk '(NF==12) && ($9==89.52) && ($7>0){print(substr($1,1,42)"_stars2_mom.cat")}' >> momcatlist.txt
+ # all cats with bad score
+ awk '$10>1000{print $2"stars2_mom.cat"}' $viskom/SCIENCE/psfmoments_{$yyyymm}_le1_score.txt > badscore.txt  
+ # all cats with suspiciously small size
+ find $viskom/SCIENCE -name C_$yyyymm"*mom.cat" -size -20000c -exec basename {} ";" > toosmall.txt
+ cat badscore.txt toosmall.txt|sort|uniq > reject.txt
+ set rejects_to_delete = `ls C_$yyyymm*mom.cat | grep -f reject.txt`
+ if $rejects_to_delete != "" \rm -f $rejects_to_delete
+ # all cats that should be analysed
+ grep -v -f reject.txt momcatlist.txt > momcatlist_todo.txt   
+ # all cats already in gaia folder
+ find . -name C_$yyyymm"*mom.cat" -exec basename {} ";" > here.txt
+ # all cats missing from gaia folder with good or unknown score
+ cat here.txt momcatlist_todo.txt |sort|uniq -u >> tocopy.txt
+ set newmomentcats = `cat tocopy.txt|wc -l`
+
+# if there are new files, run the gaia pipeline
+ if ($newmomentcats > 0) then
+  # copy the identified missing but good files to gaia directory, ready for domatchgaia
+  echo Found `wc -l tocopy.txt | sed 's/tocopy.txt/files to copy/'` from $yyyymm
+  awk '{print("cp -n $viskom/SCIENCE/"$1, ".")}' tocopy.txt > cmds
+  source cmds
+
+  ls -1 `cat momcatlist_todo.txt` > allmoms.txt  # make sure files really exist
+  set targetlist = allmoms.txt     # do this to clean up any missed files
+
+  echo `date` Aligning new moment catalogue files to Gaia and getting VIS fluxes...
+
+  foreach c (`cat $targetlist`)
+   set f = `echo $c|sed 's/_stars2_mom.cat//'`
+   if ! -e {$f}_stars2_gaia.png then
+    set lll = `cat $viskom/FITS/fitslist20????.txt | grep $f`
+    set nf = `echo $lll|awk '{print NF}'`
+    if ($nf == 12) then
+     p3 $scr/align_Gaia_to_VISWCS.py `echo $lll | gawk '{print gensub(".fits","_stars2.cat",1,$1),$4,$5,$6}'`
+    else if ($nf == 13) then
+     p3 $scr/align_Gaia_to_VISWCS.py `echo $lll | gawk '{print gensub(".fits","_stars2.cat",1,$1),$5,$6,$7}'`
+    endif
+   endif
+   if ! -e {$f}_stars2_fluxrat_bprp.png then
+    if -e {$f}_stars2_gaia.cat then
+     if ($nf == 12) then
+      p3 $scr/matchcat2gaiaVIS.py $c `echo $lll | gawk '{print $9}'` |tail -4 |tee {$f}_x_gaia_dxdy.txt
+     else if ($nf == 13) then
+      p3 $scr/matchcat2gaiaVIS.py $c `echo $lll | gawk '{print $10}'` |tail -4 |tee {$f}_x_gaia_dxdy.txt
+     endif
+    endif
+   endif
+  end
+  \rm  ~/.astropy/cache/astroquery/Vizier/*
+
+  echo `date` Getting the zeropoint offsets... 
+  foreach dxdy (`cat $targetlist|sed "s/stars2_mom.cat/x_gaia_dxdy.txt/"`)
+   set z = `echo $dxdy|sed 's/x_gaia_dxdy.txt/frat.txt/'`
+   if ! -e $z then
+    echo Making $z
+    p3 $scr/mapzptwithgaia.py $dxdy
+    p3 $scr/addgaiatomomcat.py $z
+   endif
+  end
+ else
+  echo No new $yyyymm moment cats for Gaia photometry analysis
+ endif
+

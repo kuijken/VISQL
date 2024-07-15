@@ -1,0 +1,262 @@
+
+echo `date` compiling lists of short and long exposures
+
+foreach dd (`cat $scr/yyyymm`)
+awk '{getline;getline;cat=$1;sig=$4;getline;curv=($6+$8-2*$7);if (sig<10 && $9==89.52 && curv>-0.175 && curv<-0.025) {print $0,curv,$8/$6}}' C_$dd*dxdy.txt > all_short_$dd.txt
+awk '{getline;getline;cat=$1;sig=$4;getline;curv=($6+$8-2*$7);if (sig<10 && $9==560.52 && curv>-0.175 && curv<-0.025) {print $0,curv,$8/$6}}' C_$dd*dxdy.txt > all_long_$dd.txt
+cat C_$dd*dxdy.txt |grep Gaia|awk '$9==560.52' > vis-over-gaia-{$dd}_long.txt
+cat C_$dd*dxdy.txt |grep Gaia|awk '$9==89.52' > vis-over-gaia-{$dd}_short.txt
+end
+
+cat all_short_202*txt > all_short.txt
+cat all_long_202*txt > all_long.txt
+echo MOMENTS_CATALOGUE VIS/GAIA BpRp1 BpRp2 BpRp3 VoverG1 VoverG2 VoverG3 EXPTIME > vis-over-gaia_long.txt
+cat vis-over-gaia-202???_long.txt >> vis-over-gaia_long.txt
+echo MOMENTS_CATALOGUE VIS/GAIA BpRp1 BpRp2 BpRp3 VoverG1 VoverG2 VoverG3 EXPTIME > vis-over-gaia_short.txt
+cat vis-over-gaia-202???_short.txt >> vis-over-gaia_short.txt
+foreach dd (`cat $scr/yyyymm`)
+ if ! -e vis-over-gaia-{$dd}-3x3_long.txt then
+  echo \# MOMENTS_CATALOGUE RATIONAME BpRp1 BpRp2 BpRp3 VoverG1 VoverG2 VoverG3 EXPTIME > vis-over-gaia-{$dd}-3x3_long.txt
+ endif
+ foreach m ( `awk '{print($1)}' vis-over-gaia-{$dd}-3x3_long.txt | uniq | grep -v -f - vis-over-gaia-{$dd}_long.txt | awk '{print $1}'` )
+  echo Doing 3x3 vis/gaia for $m .
+  p3 $scr/fitcolcol.py $m 560.52 >> vis-over-gaia-{$dd}-3x3_long.txt
+ end
+ if ! -e vis-over-gaia-{$dd}-3x3_short.txt then
+  echo \# MOMENTS_CATALOGUE RATIONAME BpRp1 BpRp2 BpRp3 VoverG1 VoverG2 VoverG3 EXPTIME > vis-over-gaia-{$dd}-3x3_short.txt
+ endif
+ foreach m ( `awk '{print($1)}' vis-over-gaia-{$dd}-3x3_short.txt | uniq | grep -v -f - vis-over-gaia-{$dd}_short.txt | awk '{print $1}'` )
+  echo Doing 3x3 vis/gaia for $m .
+  p3 $scr/fitcolcol.py $m 89.52 >> vis-over-gaia-{$dd}-3x3_short.txt
+ end
+end
+
+
+foreach c (0 )
+foreach d (0 )
+ foreach dd (0 1 2 3 4 5 6 7 8 9)
+  if `uname` == Darwin then
+   set ymd = `date -v-{$c}{$d}{$dd}d +"%Y%m%d"`
+  else
+   set ymd = `date -d "$c$d$dd days ago" +"%Y%m%d"`
+  endif
+  echo Per-ccd and per-quadrant colour-colour fits for $ymd .
+  (echo EXT XWORLD YWORLD FLUX TEXP G BpRp VFLUX GFLUX FRAT FRATMOD TEXPRATIO; cat C_{$ymd}*frat.txt |grep " 560.52 ") > C_ALL{$ymd}_long_frat.txt
+  (echo EXT XWORLD YWORLD FLUX TEXP G BpRp VFLUX GFLUX FRAT FRATMOD TEXPRATIO; cat C_{$ymd}*frat.txt |grep " 89.52 ") > C_ALL{$ymd}_short_frat.txt
+  (echo \# MOMENTS_CATALOGUE RATIONAME BpRp1 BpRp2 BpRp3 VoverG1 VoverG2 VoverG3 EXPTIME; \
+   p3 $scr/fitcolcol.py C_ALL{$ymd}_long 560.52 3) > vis-over-gaia-{$ymd}-ccd_long.txt
+  (echo \# MOMENTS_CATALOGUE RATIONAME BpRp1 BpRp2 BpRp3 VoverG1 VoverG2 VoverG3 EXPTIME; \
+   p3 $scr/fitcolcol.py C_ALL{$ymd}_short 89.52 3) > vis-over-gaia-{$ymd}-ccd_short.txt
+ end
+end
+end
+
+cat $viskom/FITS/fitslist20*.txt | awk '($5-268.75)**2/2**2+($6-65.3)**2 < 0.04{print $1}' | sed 's/.fits/_stars2_mom.cat/' > selfcal.txt
+
+echo `date` compiling lists of selfcal exposures
+
+grep -f selfcal.txt all_long.txt > selfcal_long.txt
+grep -f selfcal.txt all_short.txt > selfcal_short.txt
+
+echo `date` Plotting time series of selfcal zero points
+\cp selfcal_long.txt long.txt
+\cp selfcal_short.txt short.txt
+p3 $scr/plotice.py
+\mv iceplot_long.png iceplot_selfcal_long.png
+\mv iceplot_short.png iceplot_selfcal_short.png
+\mv iceplot_long2.png iceplot_selfcal_long2.png
+\mv iceplot_short2.png iceplot_selfcal_short2.png
+\mv iceplot_long3.png iceplot_selfcal_long3.png
+\mv iceplot_short3.png iceplot_selfcal_short3.png
+
+echo `date` Plotting time series of zero points
+\cp all_long.txt long.txt
+\cp all_short.txt short.txt
+p3 $scr/plotice.py
+
+#open iceplot_long2.png
+#open iceplot_short2.png
+
+set timefom3 = "C_20240314_20"
+#foreach dd (202403)
+ #echo `date` making FP maps for long exposures from $dd before $timefom3
+ #p3 $scr/plotzptFP.py `awk -v t=$timefom3 '$1<t{print($1)}' long.txt |grep $dd` $dd 560.52
+ #\mv iceplot_FPA_{$dd}_560.52.png  iceplot_FPA_{$dd}_560.52_beforeFom3.png
+ #echo `date` making FP maps for short exposures from $dd before $timefom3
+ #p3 $scr/plotzptFP.py `awk -v t=$timefom3 '$1<t{print($1)}' short.txt |grep $dd` $dd 89.52
+ #\mv iceplot_FPA_{$dd}_89.52.png  iceplot_FPA_{$dd}_89.52_beforeFom3.png
+ #echo `date` making FP maps for long exposures from $dd after $timefom3
+ #p3 $scr/plotzptFP.py `awk -v t=$timefom3 '$1>t{print($1)}' long.txt |grep $dd` $dd 560.52
+ #\mv iceplot_FPA_{$dd}_560.52.png  iceplot_FPA_{$dd}_560.52_afterFom3.png
+ #echo `date` making FP maps for short exposures from $dd after $timefom3
+ #p3 $scr/plotzptFP.py `awk -v t=$timefom3 '$1>t{print($1)}' short.txt |grep $dd` $dd 89.52
+ #\mv iceplot_FPA_{$dd}_89.52.png  iceplot_FPA_{$dd}_89.52_afterFom3.png
+#end
+
+foreach dd (`cat $scr/yyyymm`)
+ echo `date` making FP maps for long exposures from $dd
+ p3 $scr/plotzptFP.py `awk '{print($1)}' long.txt |grep $dd` $dd 560.52
+ echo `date` making FP maps for short exposures from $dd
+ p3 $scr/plotzptFP.py `awk '{print($1)}' short.txt |grep $dd` $dd 89.52
+end
+
+# for Guillermo:
+# p3 $scr/plotzptFP.py `awk '($1>"C_20240226") && ($1<"C_20240325"){print $1}' long.txt` 240226-240325 560.52
+# p3 $scr/plotzptFP.py `awk '($1>"C_20240325") && ($1<"C_20240422"){print $1}' long.txt` 240325-240422 560.52
+# p3 $scr/plotzptFP.py `awk '($1>"C_20240422") && ($1<"C_20240505"){print $1}' long.txt` 240422-240505 560.52
+
+# week by week FPA plots:
+# p3 $scr/plotzptFP.py `awk '($1>"C_20240215") && ($1<"C_20240222"){print $1}' long.txt` wk240215-240222 560.52
+# p3 $scr/plotzptFP.py `awk '($1>"C_20240222") && ($1<"C_20240229"){print $1}' long.txt` wk240222-240229 560.52
+# p3 $scr/plotzptFP.py `awk '($1>"C_20240229") && ($1<"C_20240307"){print $1}' long.txt` wk240229-240307 560.52
+# p3 $scr/plotzptFP.py `awk '($1>"C_20240307") && ($1<"C_20240314"){print $1}' long.txt` wk240307-240314 560.52
+# p3 $scr/plotzptFP.py `awk '($1>"C_20240314") && ($1<"C_20240321"){print $1}' long.txt` wk240314-240321 560.52
+# p3 $scr/plotzptFP.py `awk '($1>"C_20240321") && ($1<"C_20240328"){print $1}' long.txt` wk240321-240328 560.52
+# p3 $scr/plotzptFP.py `awk '($1>"C_20240328") && ($1<"C_20240404"){print $1}' long.txt` wk240328-240404 560.52
+# p3 $scr/plotzptFP.py `awk '($1>"C_20240404") && ($1<"C_20240411"){print $1}' long.txt` wk240404-240411 560.52
+# p3 $scr/plotzptFP.py `awk '($1>"C_20240411") && ($1<"C_20240418"){print $1}' long.txt` wk240411-240418 560.52
+# p3 $scr/plotzptFP.py `awk '($1>"C_20240418") && ($1<"C_20240425"){print $1}' long.txt` wk240418-240425 560.52
+# p3 $scr/plotzptFP.py `awk '($1>"C_20240425") && ($1<"C_20240502"){print $1}' long.txt` wk240425-240502 560.52
+
+if `uname` == Darwin then
+ set today        = `date        +%y%m%d`
+ set oneweekago   = `date -v -7d +%y%m%d`
+ set nextthursday = `date -v +Thu +%y%m%d`
+ set lastthursday = `date -v +Thu -v -7d +%y%m%d` 
+ set thursdaybefore = `date -v +Thu -v -14d +%y%m%d`
+else
+ set today         = `date  +%y%m%d`
+ set oneweekago    = `date -d "7 days ago" +%y%m%d`
+ set nextthursday  = `date -d "thursday" +%y%m%d`
+ set lastthursday = `date -d "last thursday" +%y%m%d`
+ set thursdaybefore = `date -d "2 weeks ago thursday" +%y%m%d`
+endif 
+
+p3 $scr/plotzptFP.py `awk -v d0=$thursdaybefore -v d1=$lastthursday '($1>"C_20"d0) && ($1<"C_20"d1){print $1}' long.txt` wk$thursdaybefore-$lastthursday 560.52
+p3 $scr/plotzptFP.py `awk -v d0=$lastthursday   -v d1=$nextthursday '($1>"C_20"d0) && ($1<"C_20"d1){print $1}' long.txt` wk$lastthursday-$nextthursday 560.52
+p3 $scr/plotzptFP.py `awk -v d0=$oneweekago     -v d1=$today        '($1>"C_20"d0) && ($1<"C_20"d1){print $1}' long.txt` $oneweekago-$today 560.52
+
+\mv iceplot_FPA_{$oneweekago}-{$today}_560.52.png iceplot_FPA_lastweek_560.52.png
+
+# time sequence on diagonals:
+p3 $scr/ploticetimelinediag.py 20240301 `date  +"%Y%m%d"` short
+\mv -f fratdiagtimeline.png iceplot_diag_short.png
+\mv -f fratxdiagtimeline.png iceplot_xdiag_short.png
+
+
+
+echo Make daily FPA plots for last 4 days:
+if `uname` == Darwin then
+ set d1 = `date -v -4d +%y%m%d`
+ set d2 = `date -v -3d +%y%m%d`
+else
+ set d1 = `date -d "4 days ago" +%y%m%d`
+ set d2 = `date -d "3 days ago" +%y%m%d`
+endif
+p3 $scr/plotzptFP.py `awk -v d1=$d1 -v d2=$d2 '($1>"C_20"d1) && ($1<"C_20"d2){print $1}' long.txt` $d1 560.52
+if `uname` == Darwin then
+ set d1 = `date -v -3d +%y%m%d`
+ set d2 = `date -v -2d +%y%m%d`
+else
+ set d1 = `date -d "3 days ago" +%y%m%d`
+ set d2 = `date -d "2 days ago" +%y%m%d`
+endif
+p3 $scr/plotzptFP.py `awk -v d1=$d1 -v d2=$d2 '($1>"C_20"d1) && ($1<"C_20"d2){print $1}' long.txt` $d1 560.52
+if `uname` == Darwin then
+ set d1 = `date -v -2d +%y%m%d`
+ set d2 = `date -v -1d +%y%m%d`
+else
+ set d1 = `date -d "2 days ago" +%y%m%d`
+ set d2 = `date -d "1 day ago"  +%y%m%d`
+endif
+p3 $scr/plotzptFP.py `awk -v d1=$d1 -v d2=$d2 '($1>"C_20"d1) && ($1<"C_20"d2){print $1}' long.txt` $d1 560.52
+if `uname` == Darwin then
+ set d1 = `date -v -1d +%y%m%d`
+ set d2 = `date        +%y%m%d`
+else
+ set d1 = `date -d "1 day ago" +%y%m%d`
+ set d2 = `date                +%y%m%d`
+endif
+p3 $scr/plotzptFP.py `awk -v d1=$d1 -v d2=$d2 '($1>"C_20"d1) && ($1<"C_20"d2){print $1}' long.txt` $d1 560.52
+\cp iceplot_FPA_{$d1}_560.52.png iceplot_FPA_latest.png
+
+if `uname` == Darwin then
+ set d1 = `date        +%y%m%d`
+ set d2 = `date -v +1d +%y%m%d`
+else
+ set d1 = `date                +%y%m%d`
+ set d2 = `date -d "tomorrow"  +%y%m%d`
+endif
+p3 $scr/plotzptFP.py `awk -v d1=$d1 -v d2=$d2 '($1>"C_20"d1) && ($1<"C_20"d2){print $1}' long.txt` $d1 560.52
+
+
+
+#open iceplot_FPA*560.52*.png
+#open iceplot_FPA*89.52*.png
+
+#echo `date` compiling zero points per CCD for all long exposures...
+#p3 $scr/plotzptCCD.py `awk '{print $1}' all_long.txt` LONG 560.52  > visgaiacolour_LONG.txt
+#echo `date` compiling zero points per CCD for all short exposures...
+#p3 $scr/plotzptCCD.py `awk '{print $1}' all_short.txt` SHORT 89.52 > visgaiacolour_SHORT.txt
+
+foreach dd (`cat $scr/yyyymm`)
+ echo `date` compiling zero points per CCD for all long $dd exposures...
+ p3 $scr/plotzptCCD.py `awk '{print $1}' all_long.txt|grep $dd` LONG_$dd 560.52  > visgaiacolour_LONG_$dd.txt
+ echo `date` compiling zero points per CCD for all short $dd exposures...
+ p3 $scr/plotzptCCD.py `awk '{print $1}' all_short.txt|grep $dd` SHORT_$dd 89.52 > visgaiacolour_SHORT_$dd.txt
+end
+
+#echo `date` compiling zero points per CCD for all long selfcal exposures...
+#p3 $scr/plotzptCCD.py `awk '{print $1}' selfcal_long.txt` SELFCAL_LONG 560.52  > visgaiacolour_SELFCAL_LONG.txt
+#echo `date` compiling zero points per CCD for all short selfcal exposures...
+#p3 $scr/plotzptCCD.py `awk '{print $1}' selfcal_short.txt` SELFCAL_SHORT 89.52 > visgaiacolour_SELFCAL_SHORT.txt
+
+#echo `date` compiling zero points per CCD for all long selfcal exposures before decontamination...
+#p3 $scr/plotzptCCD.py `awk -v t=$timefom3 '$1<t{print($1)}' selfcal_long.txt|grep 202403` SELFCAL_LONG_CONTAM 560.52  > visgaiacolour_SELFCAL_LONG_CONTAM.txt
+#echo `date` compiling zero points per CCD for all short selfcal exposures before decontamination...
+#p3 $scr/plotzptCCD.py `awk -v t=$timefom3 '$1<t{print $1}' selfcal_short.txt|grep 202403` SELFCAL_SHORT_CONTAM 89.52 > visgaiacolour_SELFCAL_SHORT_CONTAM.txt
+
+#echo `date` compiling zero points per CCD for all long selfcal exposures after decontamination...
+#p3 $scr/plotzptCCD.py `awk -v t=$timefom3 '$1>t{print($1)}' selfcal_long.txt|grep 202403` SELFCAL_LONG_DECONTAM 560.52  > visgaiacolour_SELFCAL_LONG_DECONTAM.txt
+#echo `date` compiling zero points per CCD for all short selfcal exposures after decontamination...
+#p3 $scr/plotzptCCD.py `awk -v t=$timefom3 '$1>t{print $1}' selfcal_short.txt|grep 202403` SELFCAL_SHORT_DECONTAM 89.52 > visgaiacolour_SELFCAL_SHORT_DECONTAM.txt
+
+#paste visgaiacolour_SELFCAL_SHORT_*AM.txt | awk 'BEGIN{getline;getline;getline;print("EXT BEFORE075 BEFORE175 BEFORE275 AFTER075 AFTER175 AFTER275 DIFF075 DIFF175 DIFF275")}{print($1,$8,$9,$10,$18,$19,$20,$18-$8,$19-$9,$20-$10)}' > visgaiacolour_SELFCAL_SHORT_DECONTAM_DIFF.txt
+#paste visgaiacolour_SELFCAL_LONG_*AM.txt | awk 'BEGIN{getline;getline;getline;print("EXT BEFORE075 BEFORE175 BEFORE275 AFTER075 AFTER175 AFTER275 DIFF075 DIFF175 DIFF275")}{print($1,$8,$9,$10,$18,$19,$20,$18-$8,$19-$9,$20-$10)}' > visgaiacolour_SELFCAL_LONG_DECONTAM_DIFF.txt
+
+
+#magick mosaic together the LONG_dd whole-CCD plots and make a small movie?
+
+foreach dd  (`cat $scr/yyyymm`)
+foreach ls (LONG SHORT)
+ echo `date` Making mosaic image of VIS/Gaia for $dd $ls exposures...
+ magick  \
+ \( -page +0+0  VISGaia_{$ls}_{$dd}_6-1.png \) \( -page +640+0 VISGaia_{$ls}_{$dd}_6-2.png  \) \( -page +1280+0 VISGaia_{$ls}_{$dd}_6-3.png  \) \( -page +1920+0 VISGaia_{$ls}_{$dd}_6-4.png  \) \( -page +2560+0 VISGaia_{$ls}_{$dd}_6-5.png  \) \( -page +3200+0 VISGaia_{$ls}_{$dd}_6-6.png  \)  \
+ \( -page +0+480 VISGaia_{$ls}_{$dd}_5-1.png \) \( -page +640+480 VISGaia_{$ls}_{$dd}_5-2.png  \) \( -page +1280+480 VISGaia_{$ls}_{$dd}_5-3.png  \) \( -page +1920+480 VISGaia_{$ls}_{$dd}_5-4.png  \) \( -page +2560+480 VISGaia_{$ls}_{$dd}_5-5.png  \) \( -page +3200+480 VISGaia_{$ls}_{$dd}_5-6.png  \)  \
+\( -page +0+960 VISGaia_{$ls}_{$dd}_4-1.png \) \( -page +640+960 VISGaia_{$ls}_{$dd}_4-2.png  \) \( -page +1280+960 VISGaia_{$ls}_{$dd}_4-3.png  \) \( -page +1920+960 VISGaia_{$ls}_{$dd}_4-4.png  \) \( -page +2560+960 VISGaia_{$ls}_{$dd}_4-5.png  \) \( -page +3200+960 VISGaia_{$ls}_{$dd}_4-6.png  \)  \
+\( -page +0+1440 VISGaia_{$ls}_{$dd}_3-1.png \) \( -page +640+1440 VISGaia_{$ls}_{$dd}_3-2.png  \) \( -page +1280+1440 VISGaia_{$ls}_{$dd}_3-3.png  \) \( -page +1920+1440 VISGaia_{$ls}_{$dd}_3-4.png  \) \( -page +2560+1440 VISGaia_{$ls}_{$dd}_3-5.png  \) \( -page +3200+1440 VISGaia_{$ls}_{$dd}_3-6.png  \)  \
+\( -page +0+1920 VISGaia_{$ls}_{$dd}_2-1.png \) \( -page +640+1920 VISGaia_{$ls}_{$dd}_2-2.png  \) \( -page +1280+1920 VISGaia_{$ls}_{$dd}_2-3.png  \) \( -page +1920+1920 VISGaia_{$ls}_{$dd}_2-4.png  \) \( -page +2560+1920 VISGaia_{$ls}_{$dd}_2-5.png  \) \( -page +3200+1920 VISGaia_{$ls}_{$dd}_2-6.png  \)  \
+\( -page +0+2400 VISGaia_{$ls}_{$dd}_1-1.png \) \( -page +640+2400 VISGaia_{$ls}_{$dd}_1-2.png  \) \( -page +1280+2400 VISGaia_{$ls}_{$dd}_1-3.png  \) \( -page +1920+2400 VISGaia_{$ls}_{$dd}_1-4.png  \) \( -page +2560+2400 VISGaia_{$ls}_{$dd}_1-5.png  \) \( -page +3200+2400 VISGaia_{$ls}_{$dd}_1-6.png  \)  \
+-layers mosaic VISGaia_FPA_{$ls}_{$dd}.png
+end
+end
+
+\rm VISGaia_*_*.?.png VISGaia_*_*-?.png
+
+# skip diagonal quadrant full time series as very timeconsuming
+if 0 then
+ # plot evolution of ice on quadrants on the diagonal
+ foreach ccd (1 2 3 4 5 6)
+  set quadrant = {$ccd}-{$ccd}.G
+  echo Quadrant $quadrant flux loss evolution 
+  p3 $scr/ice-per-ccd.py $quadrant 2024 long
+ end
+endif
+
+#rsync -auv iceplot*png         ~/KiDSwww/VISCOMM/ICE/
+#rsync -auv vis-over-gaia*.txt  ~/KiDSwww/VISCOMM/ICE/
+#rsync -auv iceplot*png         ~/KiDSwww/VISCOMM/ICE/
+
+#foreach dd (`cat $scr/yyyymm`)
+# rsync -auv C_$dd*col.cat      ~/KiDSwww/VISCOMM/ICE/cats/$dd/
+#end

@@ -1,0 +1,15 @@
+foreach yyyymm (`cat $scr/yyyymm`)
+foreach cat (C_$yyyymm*01.cat.gz)
+ set cosmiXplot = `basename $cat|sed 's/.cat.gz/_cosmiX.png/'`
+ set cosmicsplot = `basename $cat|sed 's/.cat.gz/_cosmics.png/'`
+ set protonplot = `basename $cat|sed 's/.cat.gz/_protons.png/'`
+ if (-e $cosmicsplot && -e $cosmiXplot && -e $protonplot) then
+  echo $cosmiXplot etc already exists.
+ else
+  p3 $scr/plotX.py $cat >> Xcounts.txt
+  echo $cosmiXplot etc made.
+ endif
+end
+end
+
+

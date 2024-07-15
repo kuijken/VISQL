@@ -1,0 +1,37 @@
+#!/bin/tcsh
+
+viskom
+
+#if `ps aux | grep md0_res | grep "\[" |wc -l` then
+# echo ===XXXXXXX=== md0_resync in progress. Not starting at `date` ===
+# exit
+#endif
+
+set lockfile = ~/viskomdarketc-lock
+
+if ! -e $lockfile then
+ touch $lockfile
+ #fits
+ #cleanfits
+ echo =================
+ echo cronjobdarketc started at `date`
+ dark
+ echo DETECTALL DARK
+ detectalldark | grep -v present
+ echo COSMIXPLOTS DARK
+ mkcosmiXplots | grep -v already
+ echo COSMICPLOTS DARK
+ mkcosmicplots | grep -v already
+ echo PROTONPLOTS DARK
+ mkprotonplots | grep -v already
+ flat
+ echo DETECTALL FLAT
+ detectallflat | grep -v present
+ echo FINDSTARS2 FLAT
+ findchimney2flat | grep -v ALREADY
+ \rm $lockfile
+ echo ===== Finished at `date` 
+else
+ echo ====== lock File found - not started at `date`
+endif
+

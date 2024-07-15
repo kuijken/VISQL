@@ -1,0 +1,14 @@
+
+foreach yyyymm (`cat $scr/yyyymm`)
+foreach cat (C_$yyyymm*01.cat.gz)
+ set protonplot = `basename $cat|sed 's/.cat.gz/_protons.png/'`
+ if -e $protonplot then
+  echo $protonplot already exists.
+ else
+  p3 $scr/plotprotons.py $cat >> protoncounts.txt
+  echo $protonplot made.
+ endif
+end
+end
+
+

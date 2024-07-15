@@ -1,0 +1,46 @@
+fits
+
+#Skip this, assuming that downloading from EAS has generated an up to date LE1 file
+#get EAS names for all fits files
+#source ../scr/query_eas
+
+
+
+foreach yyyymm ($*)
+
+ science
+ 
+ echo Compiling median PSF moments for all exposures from $yyyymm ...
+ if -e  psfmoments_{$yyyymm}.txt then
+  (awk '{print $2}' psfmoments_{$yyyymm}.txt ; ls -1 C_{$yyyymm}*mom.cat) | sort | uniq -u|grep C_ > bbb
+  set newmomentscount = `cat bbb|wc -l`
+  if ($newmomentscount > 0) then
+   medianmoments `cat bbb` >>  psfmoments_{$yyyymm}.txt
+   sort -f -k 2 psfmoments_{$yyyymm}.txt | uniq  > bbb
+   \mv bbb  psfmoments_{$yyyymm}.txt
+  else
+   \rm bbb
+  endif
+ else
+  medianmoments C_{$yyyymm}*stars2_mom.cat > psfmoments_{$yyyymm}.txt
+  set newmomentscount = `grep -v R2  psfmoments_{$yyyymm}.txt|wc -l`
+ endif
+
+ if ($newmomentscount > 0) then
+  echo Computing PSF scores...
+  p3 $scr/psfclassify.py   psfmoments_{$yyyymm}.txt
+
+  p3 $scr/plotpsftimeseries.py $yyyymm
+
+  echo making IQ plots... 
+  source $scr/mkiqplots C_{$yyyymm}*_stars2.cat
+
+ # rsync -auv C_{$yyyymm}*iq.png ~/KiDSwww/VISCOMM/IQ/$yyyymm/
+ # rsync -auv psfmoments_{$yyyymm}*.??[vt] ~/KiDSwww/VISCOMM/IQ/
+ # rsync -auv IQ_timeline*png ~/KiDSwww/VISCOMM/IQ/
+  echo Results in psfmoments_{$yyyymm}_score.txt
+ else
+  echo No new $yyyymm moments files for PSF analysis
+ endif
+
+end

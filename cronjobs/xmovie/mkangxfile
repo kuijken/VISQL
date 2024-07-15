@@ -1,0 +1,23 @@
+xray
+
+#if `ls -r1t goes*txt All_Angles_and_GOES.txt SAA-ALFA-recon.txt | tail -1` == All_Angles_and_GOES.txt then
+# echo All_Angles_and_GOES.txt up to date
+#else
+ science
+ foreach yyyymm (`cat $scr/yyyymm`)
+  echo Checking astrometry.net solutions for $yyyymm...
+  getastrom C_$yyyymm*01.png
+ end
+ xray
+ echo
+ echo GETTING ANGLES FROM ASTROMETRY INFORMATION
+ deduceangles
+ foreach yyyymm (`cat $scr/yyyymm`)
+  p3 $scr/add_X_to_observations_table_txt_month.py $yyyymm | grep -v C_20
+  cat $viskom/XRAY/All_Angles_and_GOES.txt All_Angles_and_GOES_$yyyymm.txt | sort | uniq > xxx
+  grep    FITSNAME xxx >  $viskom/XRAY/All_Angles_and_GOES.txt
+  grep -v FITSNAME xxx >> $viskom/XRAY/All_Angles_and_GOES.txt
+ end
+ echo New table XRAY/All_Angles_and_GOES.txt made.
+#endif
+

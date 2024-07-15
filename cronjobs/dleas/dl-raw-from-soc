@@ -1,0 +1,20 @@
+set le1name = `echo $1|cut -c1-57`
+set iwsname = `grep $1 le1-vs-iws.txt |awk '{print $2}'`
+
+if ! -e $iwsname then
+ # prevent download from IWS at the same time
+ touch $iwsname
+ set dlcount = `awk '{print $1+1}' $viskom/dlcount`
+ echo $dlcount > $viskom/dlcount
+ echo File $dlcount is $iwsname .
+ curl -n "https://euclidsoc.esac.esa.int//"$le1name".fits.gz" -o X$iwsname".gz"
+ echo "        " decompressing X$iwsname ...
+ if -z $iwsname then
+  (gunzip -f X$iwsname".gz" ; \mv -f  X$iwsname $iwsname) 
+  echo "        " $iwsname ready at `date`
+ else
+  echo $iwsname appeared during download - not gunzipping
+ endif
+#else
+# echo $iwsname already present
+endif
