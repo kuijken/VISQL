@@ -53,7 +53,7 @@ All folders live under a single top-level directory, pointed to by the environme
 Make sure that $viskom is set to the toplevel directory, and do
 <pre>
 	cd $viskom
-	mkdir FITS BIAS CHARGE DARK FLAT SCIENCE GAIAPHOTOM
+	mkdir FITS BIAS CHARGE DARK FLAT SCIENCE TEST TEST/GAIAPHOTOM
 </pre>
 
 Then copy the contents of all cronjobs/* directories to the $viskom/src directory (do not make subdirectories, all code should live in $viskom/src/ ). 
@@ -156,4 +156,12 @@ C_20240713_032840_W_52167482.VIS.bin_01_01_stars2_mom.png	- plots of moments vs 
 C_20240713_032840_W_52167482.VIS.bin_01_01_stars2_mom_map3.png	- maps of R2, ellipticity, coma, trefoil, median-binned per CCD
 C_20240713_032840_W_52167482.VIS.bin_01_01_iq.png		- mosaic image showing thumbnail, chimney, and ellipticity map
 C_20240713_032840_W_52167482.VIS.bin_01_01_goes.png		- evolution of GOES X-ray flux in the hours around the exposure
+	FROM GAIA MATCHING, IN TEST/GAIAPHOTOM/ directory:
+C_20240713_032840_W_52167482.VIS.bin_01_01_stars2_gaia.cat		- catalogue of all Gaia stars within 0.5deg of nominam RA, DEC
+C_20240713_032840_W_52167482.VIS.bin_01_01_x_gaia_dxdy.txt		- output from matching Gaia to star cat
+C_20240713_032840_W_52167482.VIS.bin_01_01_stars2_x_gaia_dxdy.png	- plot of astrometry residuals vs Gaia
+C_20240713_032840_W_52167482.VIS.bin_01_01_stars2_gaia.png		- plot of Gaia stars on outline of the FPA
+C_20240713_032840_W_52167482.VIS.bin_01_01_frat.txt			- VIS/G flux ratio catalogue for all stars matched to Gaia
+C_20240713_032840_W_52167482.VIS.bin_01_01_stars2_mom_col.cat		- star moments catalogue matched to Gaia, with G and Bp-Rp
+C_20240713_032840_W_52167482.VIS.bin_01_01_stars2_fluxrat_bprp.png	- Plot of VIS-G vs Bp-Rp (for flux loss measurement)
 </pre>
