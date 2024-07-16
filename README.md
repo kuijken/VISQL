@@ -123,3 +123,37 @@ The following jobs, which can be run as cronjobs, take care of various parts of 
      match star catalogues to GAIA, make (VIS-G) vs (Bp-Rp) colour-colour diagram and deduce relative zeropoint
      aggregate results in various plots and tables (per exposure, per day, per quadrant, per ccd, etc)
 
+---------
+
+**Example output**
+
+for a SCIENCE frame:
+<pre>
+C_20240713_032840_W_52167482.VIS.bin_01_01.fits			- link to fits file
+C_20240713_032840_W_52167482.VIS.bin_01_01.cat.gz		- SExtractor catalogue
+C_20240713_032840_W_52167482.VIS.bin_01_01.png			- thumbnail image of full mosaic
+C_20240713_032840_W_52167482.VIS.bin_01_01.wcs			- WCS for thumbnail from astrometry.net
+C_20240713_032840_W_52167482.VIS.bin_01_01_cc.png		- 3x3 grid of full-resolution thumbnails
+C_20240713_032840_W_52167482.VIS.bin_01_01_cl.png			[top,center,lower][left,center,right]
+C_20240713_032840_W_52167482.VIS.bin_01_01_cr.png
+C_20240713_032840_W_52167482.VIS.bin_01_01_lc.png
+C_20240713_032840_W_52167482.VIS.bin_01_01_ll.png
+C_20240713_032840_W_52167482.VIS.bin_01_01_lr.png
+C_20240713_032840_W_52167482.VIS.bin_01_01_tc.png
+C_20240713_032840_W_52167482.VIS.bin_01_01_tl.png
+C_20240713_032840_W_52167482.VIS.bin_01_01_tr.png
+C_20240713_032840_W_52167482.VIS.bin_01_01_cosmiX.png		- image of cosmic ray counts, around ADU for Xrays
+C_20240713_032840_W_52167482.VIS.bin_01_01_cosmics.png		- ditto, wider ADU range
+C_20240713_032840_W_52167482.VIS.bin_01_01_protons.png		- ditto, only high energies (protons)
+C_20240713_032840_W_52167482.VIS.bin_01_01_rf.png		- flux v radius plot (for Xray movie)
+C_20240713_032840_W_52167482.VIS.bin_01_01_chimney.jpg		- chimney plot
+C_20240713_032840_W_52167482.VIS.bin_01_01_chimney2.png		- chimney plot with star sequende identified
+C_20240713_032840_W_52167482.VIS.bin_01_01_chimney4.png		- chimney plot colour coded by ellipticity
+C_20240713_032840_W_52167482.VIS.bin_01_01_stars2.cat		- star catalogue (subset of full SExtractor catalogue)
+C_20240713_032840_W_52167482.VIS.bin_01_01_stars2.png		- zoomed images of PSF stars across the focal plane
+C_20240713_032840_W_52167482.VIS.bin_01_01_stars2_mom.cat	- moment measurements of the stars in the star catalogue
+C_20240713_032840_W_52167482.VIS.bin_01_01_stars2_mom.png	- plots of moments vs X and Y
+C_20240713_032840_W_52167482.VIS.bin_01_01_stars2_mom_map3.png	- maps of R2, ellipticity, coma, trefoil, median-binned per CCD
+C_20240713_032840_W_52167482.VIS.bin_01_01_iq.png		- mosaic image showing thumbnail, chimney, and ellipticity map
+C_20240713_032840_W_52167482.VIS.bin_01_01_goes.png		- evolution of GOES X-ray flux in the hours around the exposure
+</pre>
