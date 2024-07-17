@@ -216,3 +216,11 @@ iceplot_selfcal_long.png                  - as above, selfcal field data only
 iceplot_selfcal_long2.png                 - as above, selfcal field data only
 iceplot_selfcal_long3.png                 - as above, selfcal field data only
 </pre>
+
+See the figure below for the available combinations of spatial and
+temporal binning.
+
+<img src=example_output/gaiaphotometry/gaiaphotom-aggregations.png>
+
+In the table black entries are tables; purple indicates images of the
+FPA, and orange indicates timeline plots.
