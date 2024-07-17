@@ -131,6 +131,7 @@ The following jobs, which can be run as cronjobs, take care of various parts of 
 
 For each SCIENCE frame:
 <pre>
+	In SCIENCE/ directory:
 C_20240713_032840_W_52167482.VIS.bin_01_01.fits			- link to fits file
 C_20240713_032840_W_52167482.VIS.bin_01_01.cat.gz		- SExtractor catalogue
 C_20240713_032840_W_52167482.VIS.bin_01_01.png			- thumbnail image of full mosaic
