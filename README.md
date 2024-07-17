@@ -127,7 +127,9 @@ The following jobs, which can be run as cronjobs, take care of various parts of 
 
 **Example output**
 
-for a SCIENCE frame:
+(see example_output folder)
+
+For each SCIENCE frame:
 <pre>
 C_20240713_032840_W_52167482.VIS.bin_01_01.fits			- link to fits file
 C_20240713_032840_W_52167482.VIS.bin_01_01.cat.gz		- SExtractor catalogue
@@ -164,4 +166,53 @@ C_20240713_032840_W_52167482.VIS.bin_01_01_stars2_gaia.png		- plot of Gaia stars
 C_20240713_032840_W_52167482.VIS.bin_01_01_frat.txt			- VIS/G flux ratio catalogue for all stars matched to Gaia
 C_20240713_032840_W_52167482.VIS.bin_01_01_stars2_mom_col.cat		- star moments catalogue matched to Gaia, with G and Bp-Rp
 C_20240713_032840_W_52167482.VIS.bin_01_01_stars2_fluxrat_bprp.png	- Plot of VIS-G vs Bp-Rp (for flux loss measurement)
+</pre>
+
+**Aggregated results on image quality:**
+
+In the example_output/imagequality folder, for every month yyyymm (eg
+202407), the following tables and plots with median IQ values per
+exposure:
+<pre>
+IQ_timeline_202407.png                - plot of R2, e1, e2, tref1, tref2 vs. time (median of indiv. exposures is plotted)
+psfmoments_202407.png                 - plot of combinations of e,R2,coma,trefoil
+psfmoments_202407.txt                 - Table of median IQ parameters per exposure (redmine wiki format)
+psfmoments_202407_le1_score.csv       - Table of R2, e1, e2 and IQ score, with EAS name of exposure (csv format)
+psfmoments_202407_le1_score.txt       - Table of R2, e1, e2 and IQ score, with EAS name of exposure (wiki format)
+psfmoments_202407_score.csv           - Table of R2, e1, e2 and IQ score (csv format)
+psfmoments_202407_score.txt           - Table of R2, e1, e2, coma1,2, trefoil1,2 (wiki format)
+</pre>
+
+**Aggregated results on Gaia photometry comparison:**
+
+In the example_output/gaiaphotometry folder, a number of aggregated
+plots and tables of the average fitted VIS/Gaia flux ratio at three
+Bp-Rp colours, per day and over longer periods. Most have 'long' and
+'short' versions, for normal science (560) and short science (89)
+second exposures.
+
+<pre>
+EVERY DAY:
+iceplot_FPA_240712_560.52.png             - VIS/Gaia at Bp-Rp=1.75 hexbinned over FPA, data for one day 
+vis-over-gaia-20240711-ccd_short.txt      - table of day-averaged mean VIS/Gaia vs Bp-Rp fits, binned by quadrant, ccd, and 2x2 CCD block 
+
+EVERY WEEK:
+iceplot_FPA_wk240711-240718_560.52.png    - VIS/Gaia at Bp-Rp=1.75 hexbinned over FPA, data for one week 
+
+EVERY MONTH:
+VISGaia_FPA_SHORT_202407.png              - VIS/Gaia vs Bp-Rp binned per CCD, data for entire month
+iceplot_FPA_202407_560.52.png             - VIS/Gaia at Bp-Rp=1.75 hexbinned over FPA, data for entire month
+vis-over-gaia-202407-3x3_short.txt        - table of 3x3 binned mean VIS/Gaia vs Bp-Rp fits, for all exposures in the month 
+vis-over-gaia-202407_long.txt             - table of FPA-averaged mean VIS/Gaia vs Bp-Rp fits, for all exposures in the month 
+visgaiacolour_LONG_202407.txt             - table of month-averaged per-quadrant and per-ccd mean VIS/Gaia vs Bp-Rp fits 
+
+LONGER TIMELINES:
+iceplot_diag_short.png                    - time evolution of flux loss on six diagonal CCDs, daily averages, from March 2024
+iceplot_xdiag_short.png                   - time evolution of flux loss on six cross-diagonal CCDs, daily averages, from March 2024
+iceplot_short.png                         - time evolution of mean flux loss, averaged per exposure, three Bp-Rp colours, full timeline
+iceplot_short2.png                        - time evolution of mean flux loss, averaged per exposure, three Bp-Rp colours, from March 2024
+iceplot_short3.png                        - time evolution of mean flux loss, averaged per exposure, three Bp-Rp colours, from Jun 2024
+iceplot_selfcal_long.png                  - as above, selfcal field data only
+iceplot_selfcal_long2.png                 - as above, selfcal field data only
+iceplot_selfcal_long3.png                 - as above, selfcal field data only
 </pre>
