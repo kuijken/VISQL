@@ -171,9 +171,9 @@ C_20240713_032840_W_52167482.VIS.bin_01_01_stars2_fluxrat_bprp.png	- Plot of VIS
 
 **Aggregated results on image quality:**
 
-In the example_output/imagequality folder, for every month yyyymm (eg
-202407), the following tables and plots with median IQ values per
-exposure:
+The example_output/imagequality folder contains example tables and plots of median IQ values per exposure that are produced 
+for every month yyyymm (here 202407):
+
 <pre>
 IQ_timeline_202407.png                - plot of R2, e1, e2, tref1, tref2 vs. time (median of indiv. exposures is plotted)
 psfmoments_202407.png                 - plot of combinations of e,R2,coma,trefoil
@@ -186,11 +186,9 @@ psfmoments_202407_score.txt           - Table of R2, e1, e2, coma1,2, trefoil1,2
 
 **Aggregated results on Gaia photometry comparison:**
 
-In the example_output/gaiaphotometry folder, a number of aggregated
-plots and tables of the average fitted VIS/Gaia flux ratio at three
-Bp-Rp colours, per day and over longer periods. Most have 'long' and
-'short' versions, for normal science (560) and short science (89)
-second exposures.
+The example_output/gaiaphotometry folder illustrates the various aggregated plots and tables of the average fitted VIS/Gaia 
+flux ratio at three Bp-Rp colours, per day and over longer periods. Most have 'long' and 'short' versions, for normal 
+science (560sec) and short science (89sec) exposures.
 
 <pre>
 EVERY DAY:
