@@ -14,33 +14,18 @@ Copy dot.p3start to .p3start in home directory to define a few p3 startup module
 The following python modules are imported by various scripts and need to be present:
 
 <pre>
-from astropy.coordinates import get_sun
-from astropy.table import Table
-from astropy.time import Time
-from astroquery.vizier import Vizier
-from datetime import date
-from datetime import datetime
-from glob import glob
-from matplotlib import use
-from os import environ
-from os.path import basename
-from sys import argv
-import astropy.coordinates as coord
-import astropy.io.ascii as asc
-import astropy.io.fits as pf
-import astropy.io.votable as vot
-import astropy.units as u
-import datetime
-import datetime as dt
-import json
-import match
-import matplotlib.pyplot as plt
-import netCDF4 as nc
-import numpy as np
-import os
-import os 
-import os, requests
-import time
+	astropy
+	astroquery
+	datetime
+	glob
+	json
+	matplotlib
+	netCDF4
+	numpy
+	os
+	requests
+	sys
+	time
 </pre>
 
 the Gaiaphotom scripts use custom match.py and angsep.py from Henry Ferguson (included in the gaiaphotom folder).
