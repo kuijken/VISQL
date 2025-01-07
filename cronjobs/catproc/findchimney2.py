@@ -3,6 +3,13 @@ from sys import argv
 import matplotlib.pyplot as plt
 from matplotlib import use
 
+plt.rcParams['text.usetex']=False
+plt.rcParams['axes.labelsize']=12
+plt.rcParams['xtick.labelsize']=12
+plt.rcParams['ytick.labelsize']=12
+plt.rcParams['axes.titlesize']=10
+plt.rcParams['axes.labelweight']='normal'
+
 use('agg')
 
 catname=argv[1]
@@ -17,12 +24,12 @@ b13=b>bmin  # filter against cosmic rays, which are thin.
 f13=f[b13]
 r13=r[b13]
 
-def chimney(r,f,rc=1.1,fc=3e5,rwidth=0.15,fwidth=0.15):
+def chimney(r,f,rc=1.1,fc=3e5,rwidth=0.1,fwidth=0.15):
     smokeup=f < (r/rc)**2 * fc *(1+fwidth)
     smokelo=f > (r/rc)**2 * fc /(1+fwidth)
     stackri=r < rc*(1+rwidth)
     stackle=r > rc/(1+rwidth)
-    stacklo=f > 1e5
+    stacklo=f > 1e5 * rc**2 /1.1**2     # modified from 1e5 to give sloped limit
     diaghi =f < (r/rc)**4 * fc
     return (smokeup & smokelo & diaghi & stackle) | (stackri & stackle & stacklo & diaghi)
 
