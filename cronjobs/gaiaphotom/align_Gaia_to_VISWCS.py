@@ -26,6 +26,9 @@ rac,decc,pa=[float(x) for x in argv[2:5]]
 #tilename='EUC_VIS_SWL-STK-000-000000-0000000__20231121T232926.310495Z.cat'
 #tile=pf.open(tiledir+tilename)
 tile=np.loadtxt(tiledir+catname,unpack=True)
+if not len(tile):
+    exit()
+    
 tilecat={}
 tilecat['RAVIS']=tile[0]
 tilecat['DECVIS']=tile[1]
@@ -68,7 +71,7 @@ import astropy.units as u
 Vizier.ROW_LIMIT=-1
 Vizier.catalog='I/355/gaiadr3'
 try:
-    gaia=Vizier.query_region(coord.SkyCoord(ra=rac,dec=decc,unit=(u.deg,u.deg)),radius=0.5*u.deg)[0]
+    gaia=Vizier.query_region(coord.SkyCoord(ra=rac,dec=decc,unit=(u.deg,u.deg)),radius=0.6*u.deg)[0]
 except:
     print('Vizier query returned no results for',catname,'around RA,DEC=',rac,decc)
     exit()
