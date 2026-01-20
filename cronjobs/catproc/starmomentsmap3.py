@@ -22,17 +22,21 @@ try:
     x,y,flx,flxerr,r,rim,xccd,yccd,xc,yc,sumwt,R2,e1,e2,t1,t2,c1,c2 = np.loadtxt(catname,unpack=True,usecols=range(1,19))
 except:
     print(catname,'is empty.')
+    plt.figure(figsize=(12,9))
+    plt.savefig(catname[:-4]+'_map3.png')
     exit()
-
-if len(extname)==0:
+    
+if extname.size<=1:
     print(catname,'is empty.')
+    plt.figure(figsize=(12,9))
+    plt.savefig(catname[:-4]+'_map3.png')
     exit()
 
 # strip .gz suffix if present
 if catname[-3:]=='.gz':
     catname=catname[:-3]
     
-exts=np.unique(np.char.ljust(extname,3))
+exts=np.unique([s[:3] for s in extname])
 iext=np.arange(len(exts))
 xx=0.*iext
 yy=0.*iext

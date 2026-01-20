@@ -20,10 +20,15 @@ try:
     x,y,flx,flxerr,r,rim,xccd,yccd,xc,yc,sumwt,R2,e1,e2,t1,t2,c1,c2 = np.loadtxt(catname,unpack=True,usecols=range(1,19))
 except:
     print(catname,'is empty.')
+    plt.figure(figsize=(10,10))
+    plt.savefig(catname[:-4]+'.png')
     exit()
-
-if len(extname)==0:
+    
+#if len(extname)==0:
+if extname.size==0:
     print(catname,'is empty.')
+    plt.figure(figsize=(10,10))
+    plt.savefig(catname[:-4]+'.png')
     exit()
        
 if catname[-3:]=='.gz':
@@ -32,8 +37,8 @@ if catname[-3:]=='.gz':
 plt.figure(figsize=(10,10))
 
 # subsample the data if there are too many points to plot.
-if len(x)>1000:
-    keep=np.random.rand(len(x)) < 1000/len(x)
+if x.size>1000:
+    keep=np.random.rand(x.size) < 1000/len(x)
     x=x[keep]
     y=y[keep]
     c1=c1[keep]

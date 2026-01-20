@@ -83,3 +83,16 @@ counts.sort()
 top10count=counts[-10]-np.median(counts)
 #print(catfile[:-4]+'.fits',top10count,exptime+readtime/2,exptime)
 
+# make rfdiagram while here.
+
+pngfile=catfile[:-4]+'_rf.png'
+plt.hist2d(rad,np.log10(f),bins=100,range=[[0,3],[2.5,5.5]],cmap='jet',norm='log',vmin=1e2,vmax=1e4)
+plt.colorbar()
+plt.xlabel('Flux Radius [pix]')
+plt.ylabel('log10(flux) [ADU]')
+plt.title(catfile)
+plt.savefig(pngfile)
+plt.clf()
+print(pngfile,'created.')
+
+plt.close()
