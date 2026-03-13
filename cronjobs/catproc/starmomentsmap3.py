@@ -37,6 +37,7 @@ if catname[-3:]=='.gz':
     catname=catname[:-3]
     
 exts=np.unique([s[:3] for s in extname])
+exts=np.unique(extname)
 iext=np.arange(len(exts))
 xx=0.*iext
 yy=0.*iext
@@ -49,6 +50,10 @@ tref1=0.*iext
 tref2=0.*iext
 for i in iext:
     keep=np.char.startswith(extname,exts[i]) & ~np.isnan(R2)
+# use next line if you want CCD-binned maps
+#    keep=np.array([s[:3]==exts[i] for s in extname]) & ~np.isnan(R2)
+# OR use next line if you want quadrant-binned maps
+#    keep=np.array([s==exts[i] for s in extname]) & ~np.isnan(R2)
     RR2[i]=np.median(R2[keep])
     coma1[i]=np.median(c1[keep])
     coma2[i]=np.median(c2[keep])
