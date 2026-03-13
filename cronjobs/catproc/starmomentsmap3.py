@@ -48,8 +48,7 @@ ell2=0.*iext
 tref1=0.*iext
 tref2=0.*iext
 for i in iext:
-#    keep=np.char.startswith(extname,exts[i]) & ~np.isnan(R2)
-    keep=np.array([s[:3]==exts[i] for s in extname]) & ~np.isnan(R2)
+    keep=np.char.startswith(extname,exts[i]) & ~np.isnan(R2)
     RR2[i]=np.median(R2[keep])
     coma1[i]=np.median(c1[keep])
     coma2[i]=np.median(c2[keep])
