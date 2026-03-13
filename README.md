@@ -10,7 +10,11 @@ VIS quick-look raw fits data monitoring code
 
 All code is wrapped by tcsh scripts.
 
-Copy dot.p3start to .p3start in home directory to define a few p3 startup modules
+Copy dot.p3start to .p3start in home directory to define a few p3 startup modules.
+
+Also copy matplotlibrc to relevant place (eg .config/matplotlib/ ) to homogenize plot style.
+(only a few settings modified from default: some fonts and sizes, and axes.linewidth)
+
 The following python modules are imported by various scripts and need to be present:
 
 <pre>
