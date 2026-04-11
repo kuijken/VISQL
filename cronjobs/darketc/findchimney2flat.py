@@ -3,6 +3,13 @@ from sys import argv
 import matplotlib.pyplot as plt
 from matplotlib import use
 
+plt.rcParams['text.usetex']=False
+plt.rcParams['axes.labelsize']=12
+plt.rcParams['xtick.labelsize']=12
+plt.rcParams['ytick.labelsize']=12
+plt.rcParams['axes.titlesize']=10
+plt.rcParams['axes.labelweight']='normal'
+
 use('agg')
 
 catname=argv[1]
