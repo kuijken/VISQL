@@ -70,7 +70,7 @@ ffmpeg -y -pattern_type glob -i "FRAMES/TMPC_{$1}*bin_01*.png" -q 7 XCOSMIX{$1}.
 mkdir LASTFRAMES
 set lastmonth = `date -d "1 month ago" "+%Y%m%d"`
 cd FRAMES
-ln `ls -1 TMPC* | awk -v ld=$lastmonth '/_01_01/ && ($1>"FRAMES/TMPC_"ld)'` ../LASTFRAMES/
+ln `ls -1 TMPC* | awk -v ld=$lastmonth '/_01_01/ && ($1>"TMPC_"ld)'` ../LASTFRAMES/
 cd ../LASTFRAMES
 ffmpeg -y -pattern_type glob -i "*.png" -q 7 ../XCOSMIX_LASTMONTH.mpg
 cd ..
