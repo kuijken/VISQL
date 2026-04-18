@@ -18,10 +18,10 @@ p3 $scr/plotgoes24h.py
 
 science
 
-p3 $scr/rfdiagram.py *$1*.cat.gz
+p3 $scr/rfdiagram.py C_$1*.cat.gz
 
 
-foreach im (0a `find . -name "C*"$1"*_cosmiX.png" | sed 'sx./xx'|sort`)
+foreach im (0a `find . -name "C_*"$1"*_cosmiX.png" | sed 'sx./xx'|sort`)
  if ! -e ../XRAY/FRAMES/TMP$im then
   set rf = `echo $im|sed 's/_cosmiX.png/_rf.png/'`
   set goes = `echo $im|sed 's/_cosmiX.png/_goes.png/'`
@@ -32,9 +32,9 @@ end
 
 dark
 
-p3 $scr/rfdiagram.py *$1*.cat.gz
+p3 $scr/rfdiagram.py C_$1*.cat.gz
 
-foreach im (0a `find . -name "C*"$1"*_cosmiX.png" | sed 'sx./xx'|sort`)
+foreach im (0a `find . -name "C_*"$1"*_cosmiX.png" | sed 'sx./xx'|sort`)
  if ! -e ../XRAY/FRAMES/TMP$im then
   set rf = `echo $im|sed 's/_cosmiX.png/_rf.png/'`
   set goes = `echo $im|sed 's/_cosmiX.png/_goes.png/'`
@@ -44,33 +44,44 @@ foreach im (0a `find . -name "C*"$1"*_cosmiX.png" | sed 'sx./xx'|sort`)
 end
 
 xray
-echo BUILDING MOVIE FROM `ls -1 FRAMES/TMP*$1*cosmiX.png|wc -l` FRAMES
+echo BUILDING MOVIE FROM `ls -1 FRAMES/TMPC_$1*cosmiX.png|wc -l` FRAMES
 
-if `ls -t1 FRAMES/TMP*{$1}0*cosmiX.png            FRAMES/TMP*{$1}10*cosmiX.png XCOSMIX{$1}a.mpg | head -1` != XCOSMIX{$1}a.mpg then
+if `ls -t1 FRAMES/TMPC_{$1}0*cosmiX.png            FRAMES/TMPC_{$1}10*cosmiX.png XCOSMIX{$1}a.mpg | head -1` != XCOSMIX{$1}a.mpg then
  echo Building XCOSMIX{$1}a.mpg
- #convert -delay 50 FRAMES/TMP*{$1}0*cosmiX.png    FRAMES/TMP*{$1}10*cosmiX.png         XCOSMIX{$1}a.mpg
+ #convert -delay 50 FRAMES/TMPC_{$1}0*cosmiX.png    FRAMES/TMPC_{$1}10*cosmiX.png         XCOSMIX{$1}a.mpg
  magick FRAMES/TMP*{$1}0*cosmiX.png    FRAMES/TMP*{$1}10*cosmiX.png         XCOSMIX{$1}a.mpg
  chmod +r XCOSMIX{$1}a.mpg
 endif
-if `ls -t1 FRAMES/TMP*{$1}1[123456789]*cosmiX.png FRAMES/TMP*{$1}20*cosmiX.png XCOSMIX{$1}b.mpg | head -1` != XCOSMIX{$1}b.mpg then
+if `ls -t1 FRAMES/TMPC_{$1}1[123456789]*cosmiX.png FRAMES/TMPC_{$1}20*cosmiX.png XCOSMIX{$1}b.mpg | head -1` != XCOSMIX{$1}b.mpg then
  echo Building XCOSMIX{$1}b.mpg
- #convert -delay 50 FRAMES/TMP*{$1}1[123456789]*cosmiX.png FRAMES/TMP*{$1}20*cosmiX.png XCOSMIX{$1}b.mpg
- magick FRAMES/TMP*{$1}1[123456789]*cosmiX.png FRAMES/TMP*{$1}20*cosmiX.png XCOSMIX{$1}b.mpg
+ #convert -delay 50 FRAMES/TMPC_{$1}1[123456789]*cosmiX.png FRAMES/TMPC_{$1}20*cosmiX.png XCOSMIX{$1}b.mpg
+ magick FRAMES/TMPC_{$1}1[123456789]*cosmiX.png FRAMES/TMPC_{$1}20*cosmiX.png XCOSMIX{$1}b.mpg
  chmod +r XCOSMIX{$1}b.mpg
 endif
-if `ls -t1 FRAMES/TMP*{$1}2[123456789]*cosmiX.png FRAMES/TMP*{$1}3*cosmiX.png  XCOSMIX{$1}c.mpg | head -1` != XCOSMIX{$1}c.mpg then
+if `ls -t1 FRAMES/TMPC_{$1}2[123456789]*cosmiX.png FRAMES/TMPC_{$1}3*cosmiX.png  XCOSMIX{$1}c.mpg | head -1` != XCOSMIX{$1}c.mpg then
  echo Building XCOSMIX{$1}c.mpg
- #convert -delay 50 FRAMES/TMP*{$1}2[123456789]*cosmiX.png FRAMES/TMP*{$1}3*cosmiX.png  XCOSMIX{$1}c.mpg
- magick FRAMES/TMP*{$1}2[123456789]*cosmiX.png FRAMES/TMP*{$1}3*cosmiX.png  XCOSMIX{$1}c.mpg
+ #convert -delay 50 FRAMES/TMPC_{$1}2[123456789]*cosmiX.png FRAMES/TMPC_{$1}3*cosmiX.png  XCOSMIX{$1}c.mpg
+ magick FRAMES/TMPC_{$1}2[123456789]*cosmiX.png FRAMES/TMPC_{$1}3*cosmiX.png  XCOSMIX{$1}c.mpg
  chmod +r XCOSMIX{$1}c.mpg
 endif
 
-#convert -delay 50 FRAMES/TMP*$1*cosmiX.png XCOSMIX$1.mpg
-#convert FRAMES/TMP*$1*cosmiX.png XCOSMIX$1.mpg
+ffmpeg -y -pattern_type glob -i "FRAMES/TMPC_{$1}*bin_01*.png" -q 7 XCOSMIX{$1}.mpg
+
+mkdir LASTFRAMES
+set lastmonth = `date -d "1 month ago" "+%Y%m%d"`
+cd FRAMES
+ln `ls -1 TMPC* | awk -v ld=$lastmonth '/_01_01/ && ($1>"FRAMES/TMPC_"ld)'` ../LASTFRAMES/
+cd ../LASTFRAMES
+ffmpeg -y -pattern_type glob -i "*.png" -q 7 ../XCOSMIX_LASTMONTH.mpg
+cd ..
+\rm -r LASTFRAMES/
+
+#convert -delay 50 FRAMES/TMPC_$1*cosmiX.png XCOSMIX$1.mpg
+#convert FRAMES/TMPC_$1*cosmiX.png XCOSMIX$1.mpg
 #chmod +r XCOSMIX$1.mpg
 
 echo BUILDING MOVIE OF PROTONS IN SCIENCE EXPOSURES
 
 #convert -delay 50 $viskom/SCIENCE/C_$1*protons.png PROTONS$1.mpg
-magick $viskom/SCIENCE/C_$1*protons.png PROTONS$1.mpg
+magick $viskom/SCIENCE/C_$1*_01_01_protons.png PROTONS$1.mpg
 chmod +r PROTONS$1.mpg

@@ -1,0 +1,15 @@
+# list all files for a certain period by creation date
+
+set ymym = $1
+
+if `uname` == Darwin then
+ ls -lrtL -D %Y%m%dT%H%M%S C_{$ymym}* | awk '{print $6,$7}' > aaaaa
+else
+ ls -lrtL --time-style=+%Y%m%dT%H%M%S C_{$ymym}* | awk '{print $6,$7}' > aaaaa
+endif
+
+p3 $scr/pipelineperf.py aaaaa $1
+\mv pipelineperf.png pipelineperf_{$1}.png
+
+if `uname` == Darwin  open pipelineperf_{$1}.png
+

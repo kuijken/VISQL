@@ -2,12 +2,12 @@
 
 viskom
 
-if `ps aux | grep md0_res | grep "\[" |wc -l` then
- echo ===XXXXXXX=== md0_resync in progress. Not starting at `date` ===
- exit
-endif
+#if `ps aux | grep md | grep _res | grep "\[" |wc -l` then
+# echo ===XXXXXXX=== md0_resync in progress. Not starting at `date` ===
+# exit
+#endif
 
-set lockfile = ~/viskomxmovie-lock
+set lockfile = ~/`uname -n`.viskomxmovie-lock
 
 if ! -e $lockfile then
  touch $lockfile
@@ -18,35 +18,80 @@ if ! -e $lockfile then
   set yesterday = `date -v-1d +"%Y %m %d"`
   set daybeforeyesterday = `date -v-2d +"%Y %m %d"`
   set day2beforeyesterday = `date -v-3d +"%Y %m %d"`
+  set day3beforeyesterday = `date -v-4d +"%Y %m %d"`
  else
   set yesterday = `date --date='yesterday' +"%Y %m %d"`
   set daybeforeyesterday = `date --date='2 days ago' +"%Y %m %d"`
   set day2beforeyesterday = `date --date='3 days ago' +"%Y %m %d"`
+  set day3beforeyesterday = `date --date='4 days ago' +"%Y %m %d"`
  endif
  set today = `date +"%Y %m %d"`
- source $scr/getgoes $day2beforeyesterday
- source $scr/getgoes $daybeforeyesterday
- source $scr/getgoes $yesterday
- source $scr/getgoes $today
- \rm `find . -size 0 -name "goes*.txt"`
+ getgoes $day3beforeyesterday
+ getgoes $day2beforeyesterday
+ getgoes $daybeforeyesterday
+ getgoes $yesterday
+ getgoes $today
+ set day3beforeyesterday = `echo $day3beforeyesterday |sed 's/ //g'`
+ set day2beforeyesterday = `echo $day2beforeyesterday |sed 's/ //g'`
+ set daybeforeyesterday  = `echo $daybeforeyesterday  |sed 's/ //g'`
+ set yesterday           = `echo $yesterday           |sed 's/ //g'`
+ set today               = `echo $today               |sed 's/ //g'`
+ find . -size 0 -name "goes*.txt" -delete
 # \rm `find . -size -35k -name "*goes.png"`
  source $scr/mkangxfile
  #source $scr/mk3panelXmovie 202307
  #source $scr/mk3panelXmovie 202308
  #source $scr/mk3panelXmovie 202309
  #source $scr/mk3panelXmovie 202310
- # clean up goes plots that are probably out of date
- \rm       C_`echo $day2beforeyesterday|sed 's/ //g'`*goes.png \
-    FRAMES/TMPC_`echo $day2beforeyesterday|sed 's/ //g'`*.png \
-           C_`echo $daybeforeyesterday|sed 's/ //g'`*goes.png \
-    FRAMES/TMPC_`echo $daybeforeyesterday|sed 's/ //g'`*.png \
-           C_`echo $yesterday|sed 's/ //g'`*goes.png \
-    FRAMES/TMPC_`echo $yesterday|sed 's/ //g'`*.png \
-           C_`echo $today|sed 's/ //g'`*goes.png \
-    FRAMES/TMPC_`echo $today|sed 's/ //g'`*.png
+ # clean up goes plots that are out of date
+ # compare date of goesyyyymmdd.txt file with plots from after 1000 one day earlier.
+ if      `ls -1t C_{$day3beforeyesterday}_[12]*goes.png goes$day2beforeyesterday.txt|head -1` == goes$day2beforeyesterday.txt then
+   echo goes$day2beforeyesterday.txt more recent than png files from $day3beforeyesterday.
+   echo Remove png files from after {$day3beforeyesterday}T1000 .
+   \rm C_{$day3beforeyesterday}_[12]*goes.png C_{$day2beforeyesterday}*goes.png C_{$daybeforeyesterday}*goes.png C_{$yesterday}*goes.png
+   \rm FRAMES/TMPC_{$day3beforeyesterday}_[12]*.png FRAMES/TMPC_{$day2beforeyesterday}*.png \
+         FRAMES/TMPC_{$daybeforeyesterday}*.png FRAMES/TMPC_{$yesterday}*.png
+ else if `ls -1t C_{$day2beforeyesterday}_[12]*goes.png goes$daybeforeyesterday.txt|head -1` == goes$daybeforeyesterday.txt then
+   echo goes$day2beforeyesterday.txt predates png files from $day3beforeyesterday. Good.
+   echo goes$daybeforeyesterday.txt more recent than png files from $day2beforeyesterday.
+   echo Remove png files from after {$day2beforeyesterday}T1000 .
+   \rm C_{$day2beforeyesterday}_[12]*goes.png C_{$daybeforeyesterday}*goes.png C_{$yesterday}*goes.png
+   \rm FRAMES/TMPC_{$day2beforeyesterday}_[12]*.png FRAMES/TMPC_{$daybeforeyesterday}*.png FRAMES/TMPC_{$yesterday}*.png
+ else if `ls -1t C_{$daybeforeyesterday}_[12]*goes.png goes$yesterday.txt|head -1` == goes$yesterday.txt then
+   echo goes$day2beforeyesterday.txt predates png files from $day3beforeyesterday. Good.
+   echo goes$daybeforeyesterday.txt predates png files from $day2beforeyesterday. Good.
+   echo goes$yesterday.txt more recent than png files from $daybeforeyesterday.
+   echo Remove png files from after {$daybeforeyesterday}T1000 .
+   \rm C_{$daybeforeyesterday}_[12]*goes.png C_{$yesterday}*goes.png
+   \rm FRAMES/TMPC_{$daybeforeyesterday}_[12]*.png FRAMES/TMPC_{$yesterday}*.png
+ else
+   echo goes$day2beforeyesterday.txt predates png files from $day3beforeyesterday. Good.
+   echo goes$daybeforeyesterday.txt predates png files from $day2beforeyesterday. Good.
+   echo goes$yesterday.txt predates png files from $daybeforeyesterday. Good.
+   echo Remove png files from after {$yesterday}T1000 . 
+   \rm C_{$yesterday}_[12]*goes.png
+   \rm FRAMES/TMPC_{$yesterday}_[12]*.png
+ endif
+ echo Remove any png files pertaining to today $today which are always out of date.
+ \rm C_$today*goes.png FRAMES/TMPC_$today*.png
+# \rm       C_$day2beforeyesterday*goes.png \
+#    FRAMES/TMPC_$day2beforeyesterday*.png \
+#           C_$daybeforeyesterday*goes.png \
+#    FRAMES/TMPC_$daybeforeyesterday*.png \
+#           C_$yesterday*goes.png \
+#    FRAMES/TMPC_$yesterday*.png \
+#           C_$today*goes.png \
+#    FRAMES/TMPC_$today*.png
  foreach yyyymm (`cat $scr/yyyymm`)
   source $scr/mk3panelXmovie $yyyymm
  end
+ rsync -auv XCOSMIX*mpg kuijken@kuinder.strw.leidenuniv.nl:KiDSwww/VISCOMM/MISCMOVIES/
+ rsync -auv PROTONS*mpg kuijken@kuinder.strw.leidenuniv.nl:KiDSwww/VISCOMM/MISCMOVIES/
+ science
+ source $scr/pipelineperf $day3beforeyesterday
+ source $scr/pipelineperf $day2beforeyesterday
+ source $scr/pipelineperf $daybeforeyesterday
+ source $scr/pipelineperf $yesterday
  \rm $lockfile
  echo ===== Finished at `date` 
 else
