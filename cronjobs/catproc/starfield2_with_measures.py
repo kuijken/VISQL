@@ -116,14 +116,15 @@ for ext in f[1:]:
             t2=(3*q21-q03)/R3
             c1=(q30+q12)/R3
             c2=(q21+q03)/R3
-            print((' %5s %12.6f %12.6f %10.6g %8.4g '+
-                   '%8.3f %10.6f %12.4f %12.4f '+
-                   '%8.4f %8.4f %10.6g %8.5f '+
-                   '%8.5f %8.5f %8.5f %8.5f %8.5f %8.5f') %
-                (extname,x[star],y[star],flx[star],flxerr[star],
-                 r[star],rim[star],istar+xc,jstar+yc,
-                 xc,yc,sumwt,R2,
-                 e1,e2,t1,t2,c1,c2))
+            if not np.isnan(sumwt):
+                print((' %5s %12.6f %12.6f %10.6g %8.4g '+
+                    '%8.3f %10.6f %12.4f %12.4f '+
+                    '%8.4f %8.4f %10.6g %8.5f '+
+                    '%8.5f %8.5f %8.5f %8.5f %8.5f %8.5f') %
+                    (extname,x[star],y[star],flx[star],flxerr[star],
+                    r[star],rim[star],istar+xc,jstar+yc,
+                    xc,yc,sumwt,R2,
+                    e1,e2,t1,t2,c1,c2))
 
 plt.imshow(np.arcsinh(out/aspar)*aspar,vmin=0.,origin='lower',
                interpolation='none')
