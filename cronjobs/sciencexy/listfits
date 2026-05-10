@@ -1,32 +1,39 @@
 set c = $cwd
 
-set fitslockfile = ~/fitslist-lock
+set fitslockfile = ~/`uname -n`.fitslist-lock
 
 if -e $fitslockfile then
  echo $fitslockfile found - fitslist not updated
 else
  touch $fitslockfile
  fits
- touch fitslist.txt # in case start from scratch, create empty fitslist.txt
- # find fits files that are present but not in fitslist.txt
- awk '{print $1}' fitslist.txt |grep C_202  > tmpoldfitsfiles.txt
- 
-# find all fits files that are not yet in fitslist.txt, but also not very recently modified (may be still downloading)
-find . -name "C*.fits" -mmin -1  | sed 'sx./xx' > tmpverynewfiles.txt
-\ls |grep "\.fits" |grep -v gz | grep -v -f tmpoldfitsfiles.txt | grep -v -f tmpverynewfiles.txt |grep -v XC > tmpnewfitsfiles.txt
-
-
-wc -l tmp???fitsfiles.txt
+ touch fitslist.txt # in case start from scratch, create empty fitslist.txt 
+ # first list all fits files for the month(s)
+ \rm tmpallfitsfiles.txt
+ foreach yyyymm (`cat $scr/yyyymm`)
+  \ls -1 C_$yyyymm*.fits  >> tmpallfitsfiles.txt
+ end
+ # flag very recent files that may be incomplete
+ find . -name "C*.fits" -mmin -1  | sed 'sx./xx' > tmpverynewfiles.txt
+ # find all files that are not yet in fitslist.txt and not very new
+ awk '/^C_/{print $1}' fitslist.txt | grep -v -f - tmpallfitsfiles.txt | grep -v -f tmpverynewfiles.txt > tmpnewfitsfiles.txt 
+  
+ wc -l tmp???fitsfiles.txt
 
  #
  # if there are new files, run dfits on them and rebuild fitslist.txt
  if ! -z tmpnewfitsfiles.txt then
   dfits `cat tmpnewfitsfiles.txt` | fitsort -d DATE-OBS EXPTIME IMG_T1 IMG_T2 | awk 'NF>=3' > tmpnewfitslist.txt
-  cat fitslist.txt tmpnewfitslist.txt | grep C_202 | grep -v XC | sort |uniq > aaa
+  \cp fitslist.txt fitslist_backup.txt
+  cat fitslist.txt tmpnewfitslist.txt | grep C_ | grep -v XC | sort |uniq > aaa
   echo \# FITSNAME DATE-OBS EXPTIME IMG_T1 IMG_T2 > fitslist.txt
   cat aaa >>fitslist.txt
   \rm tmp*txt aaa
   echo FITS/fitslist.txt created
+  # also update fitslistYYYYMM.txt files with identifycalblocks
+  foreach yyyyf (`cat $scr/yyyymm`)
+   source $scr/identifycalblocks $yyyyf
+  end
  else
   echo fitslist.txt was complete.
  endif

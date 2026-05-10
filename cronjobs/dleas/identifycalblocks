@@ -1,7 +1,53 @@
 
+set idcallockfile = ~/identifycalblocks-lock
+
+if ! -e $idcallockfile touch $idcallockfile
+
+# list C_YYYYMM*.fits header keywords in fitslistYYYYMM.txt
+# where YYYYMM is the argument with which the script is called.
+# Add info from new fits files to existing list without removing old entries
+
 cd $viskom/FITS
 
-dfits C_$1*.fits | fitsort CALBLKID CALBLKVR DITHOBS RA DEC PA SAA ALPHA EXPTIME IMG_T1 IMG_T2 OBS_ID > tmplist
-\mv tmplist fitslist$1.txt
+# First compile list of C_YYYYMM*.fits files not already in fitslistYYYYMM.txt
 
- # rsync -auv --no-links *txt ~/data/VISCOMM/FITS/
+if -e fitslist$1.txt then
+ \ls -1 C_$1*fits > tmp_fits$1.present.txt    # all available fits files from the month 
+ awk  '/^C_/{print $1}' fitslist$1.txt > tmp_fits$1.donebefore.txt  # all files already in fitslistYYYYMM
+ set filestoread = `grep -v -f tmp_fits$1.donebefore.txt tmp_fits$1.present.txt`   # files to do
+ \rm  tmp_fits$1.present.txt tmp_fits$1.donebefore.txt
+else
+ set filestoread = `\ls -1 C_$1*.fits`
+endif
+
+if "$filestoread" != "" then
+  dfits $filestoread | fitsort CALBLKID CALBLKVR DITHOBS RA DEC PA SAA ALPHA EXPTIME IMG_T1 IMG_T2 OBS_ID > tmplist
+  if -e fitslist$1.txt then  # append output without header line
+   echo Updating fitslist$1.txt with headers of new fits files
+   cp -f fitslist$1.txt tmpfitslist$1.txt
+   tail -n +2 tmplist >> tmpfitslist$1.txt
+  else
+   mv tmplist tmpfitslist$1.txt
+   echo Had to create new fitslist$1.txt
+  endif
+  # sort fitslistYYYYMM.txt, keeping header line at the top
+  grep FILE tmpfitslist$1.txt |uniq > aaaa
+  grep -v FILE tmpfitslist$1.txt |grep C_|sort|uniq >> aaaa
+  \mv -f aaaa fitslist$1.txt
+  rm -f tmpfitslist$1.txt
+else
+  echo No new fits file header info to add to fitslist$1.txt
+endif
+
+rm -f $idcallockfile
+else
+
+echo Lockfile found - skipping identifycalblocks
+endif
+
+
+
+#dfits C_$1*.fits | fitsort CALBLKID CALBLKVR DITHOBS RA DEC PA SAA ALPHA EXPTIME IMG_T1 IMG_T2 OBS_ID > tmplist
+#\mv tmplist fitslist$1.txt
+
+#rsync -auv --no-links *txt ~/data/VISCOMM/FITS/
