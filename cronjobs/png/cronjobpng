@@ -15,13 +15,13 @@ if ! -e $lockfile then
  echo cronjobpng started at `date`
  #fits
  #cleanfits
- foreach yyyymm (`cat $scr/yyyymm`)
-  echo SORTDATA $yyyymm
-  sortdata $yyyymm
-  mkallpng $yyyymm | grep -v overwritt |& grep -v Warning
+ foreach ym (`cat $scr/yyyymm`)
+  echo SORTDATA $ym
+  sortdata $ym
+  mkallpng $ym | grep -v overwritt |& grep -v Warning
   science
-  echo ASTROMETRY.NET $yyyymm
-  getastrom C_$yyyymm*01.png |grep -v file
+  echo ASTROMETRY.NET $ym
+  getastrom C_$ym*01.png |grep -v file
  end
  \rm $lockfile
  echo ===== Finished at `date` 
