@@ -8,15 +8,8 @@ else
  touch $fitslockfile
  fits
  touch fitslist.txt # in case start from scratch, create empty fitslist.txt 
- # first list all fits files for the month(s)
- \rm tmpallfitsfiles.txt
- foreach yyyymm (`cat $scr/yyyymm`)
-  \ls -1 C_$yyyymm*.fits  >> tmpallfitsfiles.txt
- end
- # flag very recent files that may be incomplete
- find . -name "C*.fits" -mmin -1  | sed 'sx./xx' > tmpverynewfiles.txt
- # find all files that are not yet in fitslist.txt and not very new
- awk '/^C_/{print $1}' fitslist.txt | grep -v -f - tmpallfitsfiles.txt | grep -v -f tmpverynewfiles.txt > tmpnewfitsfiles.txt 
+ # make list of new fits files in current directory
+ p3 $scr/listnewfits.py 
   
  wc -l tmp???fitsfiles.txt
 
