@@ -16,13 +16,13 @@ foreach yyyymm ($*)
   set newmomentscount = `cat bbb|wc -l`
   if ($newmomentscount > 0) then
    medianmoments `cat bbb` >>  psfmoments_{$yyyymm}.txt
-   sort -f -k 2 psfmoments_{$yyyymm}.txt | uniq  > bbb
+   sort -f -k 2 psfmoments_{$yyyymm}.txt | uniq |grep -v nan|grep -v loadtxt > bbb
    \mv bbb  psfmoments_{$yyyymm}.txt
   else
    \rm bbb
   endif
  else
-  medianmoments C_{$yyyymm}*stars2_mom.cat > psfmoments_{$yyyymm}.txt
+  medianmoments C_{$yyyymm}*stars2_mom.cat |grep -v nan|grep -v loadtxt > psfmoments_{$yyyymm}.txt
   set newmomentscount = `grep -v R2  psfmoments_{$yyyymm}.txt|wc -l`
  endif
 
