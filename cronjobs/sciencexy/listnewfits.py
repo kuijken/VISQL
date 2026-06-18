@@ -16,9 +16,12 @@ print('Checking for corrupted lines in fitslist.txt:')
 badlines=[]
 for x in fitslist:
     xs=x.split()
-    if (xs[0]!='#') & ((len(xs)!=5) | (len(xs[0])!=47)):
-        print(x,end='')
-        badlines.append(x)
+    try:
+        if (xs[0]!='#') & ((len(xs)!=5) | (len(xs[0])!=47)):
+            print(x,end='')
+            badlines.append(x)
+    except:
+        badlines.append(x)            
         
 # internally only keep the legal lines
 print(len(fitslist),'lines in fitslist.txt were found.')
