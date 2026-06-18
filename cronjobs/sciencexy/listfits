@@ -9,7 +9,7 @@ else
  fits
  touch fitslist.txt # in case start from scratch, create empty fitslist.txt 
  # make list of new fits files in current directory
- p3 $scr/listnewfits.py 
+ p3 $scr/listnewfits.py clean
   
  wc -l tmp???fitsfiles.txt
 
