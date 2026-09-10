@@ -7,6 +7,22 @@ viskom
 # exit
 #endif
 
+
+# kill any ds9 processes that have been running for more than 10 minutes
+set ds9proc = `ps -aux |grep "ds9 -display :9" |grep -v grep |awk '{print $2}'`
+if $ds9proc != "" then
+ echo Found running ds9 -display :9 processes: $ds9proc
+ set deadproc = `ps -o pid,etimes $ds9proc |awk '$1<9999999 && $2>600{print $1}' `
+ if $deadproc != "" then
+  echo `date` Killing hung ds9 process $deadproc
+  kill $deadproc
+ else
+  echo No hung ds9 processes found
+ endif
+endif
+
+
+
 set lockfile = ~/viskompng-lock
 
 if ! -e $lockfile then
