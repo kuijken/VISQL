@@ -50,7 +50,7 @@ Some files are duplicated, you should be able to select only the ones you want.
 
 External executables that are needed to run these scripts include
 <pre>
-SExtractor, dfits, dos2unix, ds9 .
+SExtractor, dfits, dos2unix, ds9, ffmpeg, magick .
 </pre>
 
 
